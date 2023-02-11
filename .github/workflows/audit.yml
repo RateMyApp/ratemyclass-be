@@ -1,44 +1,44 @@
 name: Audit
 on:
-  pull_request:
-    branches: [master]
-  push:
-    branches: []
+    pull_request:
+        branches: [master]
+    push:
+        branches: ["*"]
 jobs:
-  audit:
-    runs-on: ubuntu-20.04
-    steps:
-      - uses: actions/checkout@v2
-      - name: Set up Go
-        uses: actions/setup-go@v2
-        with:
-          go-version: 1.19
-      - name: Verify dependencies
-        run: go mod verify
-      - name: Build
-        run: go build
-      - name: Run go vet
-        run: go vet ./...
-      - name: Install staticcheck
-        run: go install honnef.co/go/tools/cmd/staticcheck@latest
-      - name: Run staticcheck
-        run: staticcheck ./...
-      - name: Unit tests
-        run: |
-            sudo go test ./... -coverprofile coverage.out -covermode count
-            sudo go tool cover -func coverage.out
-      - name: Quality Gate - Test coverage shall be above threshold
-        env:
-          TESTCOVERAGE_THRESHOLD: 90
-        run: |
-          echo "Quality Gate: checking test coverage is above threshold ..."
-          echo "Threshold             : $TESTCOVERAGE_THRESHOLD %"
-          totalCoverage=`go tool cover -func=coverage.out | grep total | grep -Eo '[0-9]+\.[0-9]+'`
-          echo "Current test coverage : $totalCoverage %"
-          if (( $(echo "$totalCoverage $TESTCOVERAGE_THRESHOLD" | awk '{print ($1 > $2)}') )); then
-              echo "OK"
-          else
-              echo "Current test coverage is below threshold. Please add more unit tests or adjust threshold to a lower value."
-              echo "Failed"
-              exit 1
-          fi
+    audit:
+        runs-on: ubuntu-20.04
+        steps:
+            - uses: actions/checkout@v3
+            - name: Set up Go
+              uses: actions/setup-go@v3
+              with:
+                  go-version: 1.19
+            - name: Verify dependencies
+              run: go mod verify
+            - name: Build
+              run: go build
+            - name: Run go vet
+              run: go vet ./...
+            - name: Install staticcheck
+              run: go install honnef.co/go/tools/cmd/staticcheck@latest
+            - name: Run staticcheck
+              run: staticcheck ./...
+            - name: Unit tests
+              run: |
+                  sudo go test ./... -coverprofile coverage.out -covermode count
+                  sudo go tool cover -func coverage.out
+            - name: Quality Gate - Test coverage shall be above threshold
+              env:
+                  TESTCOVERAGE_THRESHOLD: 90
+              run: |
+                  echo "Quality Gate: checking test coverage is above threshold ..."
+                  echo "Threshold             : $TESTCOVERAGE_THRESHOLD %"
+                  totalCoverage=`go tool cover -func=coverage.out | grep total | grep -Eo '[0-9]+\.[0-9]+'`
+                  echo "Current test coverage : $totalCoverage %"
+                  if (( $(echo "$totalCoverage $TESTCOVERAGE_THRESHOLD" | awk '{print ($1 > $2)}') )); then
+                      echo "OK"
+                  else
+                      echo "Current test coverage is below threshold. Please add more unit tests or adjust threshold to a lower value."
+                      echo "Failed"
+                      exit 1
+                  fi
