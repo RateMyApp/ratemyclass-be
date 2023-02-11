@@ -7,7 +7,7 @@ import (
 	"testing"
 )
 
-func Test_AppConfig_ShouldFailWhenNoEnvIsPresent(t *testing.T) {
+func Test_AppConfig_ShouldPanic_WhenNoEnvIsPresent(t *testing.T) {
 	defer func() {
 		if r := recover(); r == nil {
 			t.Errorf("Did not panic")
@@ -49,6 +49,7 @@ func Test_AppConfig_ShouldPass_WhenAllEnvVarArePresentInDotEnvFile(t *testing.T)
 	isEqual := reflect.DeepEqual(appConfig, expectedOutput)
 
 	if !isEqual {
-		t.Errorf("AppConfig Error: expected %v but got %v", expectedOutput, appConfig)
+		t.Errorf("AppConfig Error: expected %v but got %v", expectedOutput.String(), appConfig.String())
 	}
 }
+
