@@ -23,12 +23,10 @@ jobs:
         run: go install honnef.co/go/tools/cmd/staticcheck@latest
       - name: Run staticcheck
         run: staticcheck ./...
-      - name: Install golint
-        run: go install golang.org/x/lint/golint@latest
-      - name: Run golint
-        run: golint ./...
-      - name: Run tests
-        run: go test -race -vet=off ./...
+      - name: Unit tests
+        run: |
+            sudo go test ./... -coverprofile coverage.out -covermode count
+            sudo go tool cover -func coverage.out
       - name: Quality Gate - Test coverage shall be above threshold
         env:
           TESTCOVERAGE_THRESHOLD: 90
