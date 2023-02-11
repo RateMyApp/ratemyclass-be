@@ -12,7 +12,7 @@ jobs:
             - name: Set up Go
               uses: actions/setup-go@v3
               with:
-                  go-version: 1.19
+                  go-version: 1.18
             - name: Install dependencies
               run: go get .
             - name: Verify dependencies
@@ -27,8 +27,8 @@ jobs:
               run: staticcheck ./...
             - name: Unit tests
               run: |
-                  sudo go test ./... -coverprofile coverage.out -covermode count
-                  sudo go tool cover -func coverage.out
+                  go test ./... -coverprofile=coverage.out 
+                  go tool cover -func=coverage.out
             - name: Quality Gate - Test coverage shall be above threshold
               env:
                   TESTCOVERAGE_THRESHOLD: 90
