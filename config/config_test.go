@@ -20,7 +20,7 @@ func Test_AppConfig_ShouldFailWhenNoEnvIsPresent(t *testing.T) {
 func Test_AppConfig_ShouldPass_WhenAllEnvVarArePresentInDotEnvFile(t *testing.T) {
 	expectedOutput := AppConfig{
 		PORT:      "2000",
-		MONGO_URI: "mongodb://localhost:27017",
+		MONGO_URI: "mongodb://localhost:27013",
 		GO_ENV:    "testing",
 	}
 	defer func() {
