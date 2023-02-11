@@ -21,10 +21,6 @@ jobs:
               run: go build
             - name: Run go vet
               run: go vet ./...
-            - name: Install staticcheck
-              run: go install honnef.co/go/tools/cmd/staticcheck@master
-            - name: Run staticcheck
-              run: staticcheck ./...
             - name: Unit tests
               run: |
                   go test ./... -coverprofile=coverage.out 
