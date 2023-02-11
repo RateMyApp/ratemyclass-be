@@ -16,7 +16,7 @@ jobs:
       - name: Verify dependencies
         run: go mod verify
       - name: Build
-        run: go build -v ./...
+        run: go build
       - name: Run go vet
         run: go vet ./...
       - name: Install staticcheck
@@ -31,7 +31,7 @@ jobs:
         run: go test -race -vet=off ./...
       - name: Quality Gate - Test coverage shall be above threshold
         env:
-          TESTCOVERAGE_THRESHOLD: 0
+          TESTCOVERAGE_THRESHOLD: 90
         run: |
           echo "Quality Gate: checking test coverage is above threshold ..."
           echo "Threshold             : $TESTCOVERAGE_THRESHOLD %"
