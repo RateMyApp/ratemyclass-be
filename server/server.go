@@ -14,13 +14,12 @@ import (
 )
 
 func NewHttpServer(routers []routers.Router, lc fx.Lifecycle, appConfig config.AppConfig, ginRouter *gin.Engine, mongoDao *dao.MongoDao) *http.Server {
-
 	for _, router := range routers {
 		router.ExecRoutes()
 	}
 
 	srv := &http.Server{
-		Addr:    ":" + appConfig.Port,
+		Addr:    ":" + appConfig.PORT,
 		Handler: ginRouter,
 	}
 
@@ -35,7 +34,7 @@ func NewHttpServer(routers []routers.Router, lc fx.Lifecycle, appConfig config.A
 			return nil
 		},
 		OnStop: func(ctx context.Context) error {
-			if  err := mongoDao.Client.Disconnect(ctx); err != nil {
+			if err := mongoDao.Client.Disconnect(ctx); err != nil {
 				log.Fatal("Could not disconnect from mongo database successfully: " + err.Error())
 			}
 
