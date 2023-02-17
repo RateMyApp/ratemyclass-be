@@ -9,4 +9,5 @@ type School struct{
 	Location string`bson:"location"`
 	StudentHeadcount int `bson:"studentheadcount"`
 	StaffHeadcount int `bson:"staffheadcount"`
+	
 }
