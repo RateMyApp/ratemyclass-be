@@ -13,7 +13,10 @@ import (
 	"go.uber.org/fx"
 )
 
-func NewHttpServer(routers []routers.Router, lc fx.Lifecycle, appConfig config.AppConfig, ginRouter *gin.Engine, mongoDao *dao.MongoDao) *http.Server {
+func NewHttpServer(routers []routers.Router, lc fx.Lifecycle, appConfig config.AppConfig, ginRouter *gin.Engine, dbClient dao.DbClient) *http.Server {
+	if err := dbClient.Init(); err != nil {
+		log.Panic("Error Connecting to Database: ", err)
+	}
 	for _, router := range routers {
 		router.ExecRoutes()
 	}
@@ -34,8 +37,8 @@ func NewHttpServer(routers []routers.Router, lc fx.Lifecycle, appConfig config.A
 			return nil
 		},
 		OnStop: func(ctx context.Context) error {
-			if err := mongoDao.Client.Disconnect(ctx); err != nil {
-				log.Fatal("Could not disconnect from mongo database successfully: " + err.Error())
+			if err := dbClient.Close(ctx); err != nil {
+				log.Fatal("Could not disconnect from database successfully: " + err.Error())
 			}
 
 			return srv.Shutdown(ctx)
