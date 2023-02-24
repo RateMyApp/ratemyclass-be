@@ -1,11 +1,13 @@
 package models
 
+import "gorm.io/gorm"
+
 type CourseRating struct {
 	gorm.Model
-	Professor        Professor
+	ProfessorID      uint
 	ExperienceRating float32
 	DifficultyRating float32
 	Review           string
-	Course           Course
-	// Student Student
+	CourseID         uint
+	// StudentID uint
 }
