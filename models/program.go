@@ -7,4 +7,5 @@ type Program struct {
 	CourseCode string
 	CourseName string
 	SchoolID   uint
+	Professor  []Professor
 }
