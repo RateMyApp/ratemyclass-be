@@ -19,9 +19,9 @@ func Test_AppConfig_ShouldPanic_WhenNoEnvIsPresent(t *testing.T) {
 
 func Test_AppConfig_ShouldPass_WhenAllEnvVarArePresentInDotEnvFile(t *testing.T) {
 	expectedOutput := AppConfig{
-		PORT:      "2000",
-		MONGO_URI: "mongodb://localhost:27013",
-		GO_ENV:    "testing",
+		PORT:         "2000",
+		POSTGRES_URI: "postgres://user:pass@localhost:5432/db_name",
+		GO_ENV:       "testing",
 	}
 	defer func() {
 		os.Remove(".env.testing")
@@ -52,4 +52,3 @@ func Test_AppConfig_ShouldPass_WhenAllEnvVarArePresentInDotEnvFile(t *testing.T)
 		t.Errorf("AppConfig Error: expected %v but got %v", expectedOutput.String(), appConfig.String())
 	}
 }
-

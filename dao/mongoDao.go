@@ -14,7 +14,7 @@ type MongoDao struct {
 }
 
 func NewMongoDao(appConfig config.AppConfig) *MongoDao {
-	client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI(appConfig.MONGO_URI))
+	client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI(appConfig.POSTGRES_URI))
 	if err != nil {
 		log.Fatal("Could not connect to mongo database: " + err.Error())
 	}

@@ -1,10 +1,10 @@
 package models
 
-import "go.mongodb.org/mongo-driver/bson/primitive"
+import "gorm.io/gorm"
 
 type Program struct {
-	ID         primitive.ObjectID
-	School     School
-	CourseCode string `bson:"code"`
-	CourseName string `bson:"name"`
+	gorm.Model
+	CourseCode string
+	CourseName string
+	SchoolID   uint
 }

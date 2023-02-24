@@ -10,9 +10,9 @@ import (
 )
 
 type AppConfig struct {
-	PORT      string
-	MONGO_URI string
-	GO_ENV    string
+	PORT         string
+	POSTGRES_URI string
+	GO_ENV       string
 }
 
 func (ac AppConfig) String() string {
@@ -41,7 +41,7 @@ func InitAppConfig() AppConfig {
 		log.Println("Could not load .env file. Using os environments")
 	}
 
-	return AppConfig{PORT: getenv("PORT"), GO_ENV: env, MONGO_URI: getenv("MONGO_URI")}
+	return AppConfig{PORT: getenv("PORT"), GO_ENV: env, POSTGRES_URI: getenv("POSTGRES_URI")}
 }
 
 var Module = fx.Module("config", fx.Provide(InitAppConfig))
