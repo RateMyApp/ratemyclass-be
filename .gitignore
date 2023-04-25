@@ -23,3 +23,6 @@ go.work
 
 # dotenv files
 .env.*
+
+# pyhton script
+request.py
