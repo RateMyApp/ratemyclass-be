@@ -4,10 +4,10 @@ import (
 	"encoding/json"
 	"log"
 	"os"
-
 	"github.com/joho/godotenv"
 	"go.uber.org/fx"
 )
+
 
 type AppConfig struct {
 	PORT         string
@@ -43,5 +43,5 @@ func InitAppConfig() AppConfig {
 
 	return AppConfig{PORT: getenv("PORT"), GO_ENV: env, POSTGRES_URI: getenv("POSTGRES_URI")}
 }
-
 var Module = fx.Module("config", fx.Provide(InitAppConfig))
+
