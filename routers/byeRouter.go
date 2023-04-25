@@ -22,7 +22,7 @@ func (hr *ByeRouter) ExecRoutes() {
 		routerGroup.GET("/bye", hr.sayHelloRoute())
 	}
 }
-// factory method to create Byerouter, dependency is a ginEngine
+// factory method/constructor to create Byerouter, dependency is a ginEngine
 func NewByeRouter(ginRouter *gin.Engine) Router {
 	return &ByeRouter{ginRouter: ginRouter}
 }
