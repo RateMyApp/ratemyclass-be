@@ -7,5 +7,6 @@ type Course struct {
 	Name         string
 	Units        float32
 	Professor    []Professor `gorm:"many2many:professor_courses"`
+	User         []*User `gorm:"many2many:course_students"`
 	CourseRating []CourseRating
 }
