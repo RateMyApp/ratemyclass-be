@@ -6,17 +6,17 @@ import (
 )
 
 type signUpDto struct {
-	Email     string
-	Password  string
-	Firstname string
-	LastName  string
+	Email     string `json:"email"`
+	Password  string `json:"password"`
+	Firstname string `json:"firstname"`
+	Lastname  string `json:"lastname"`
 }
 
-func (sd *signUpDto) Validate() error {
-	return validation.ValidateStruct(sd,
-		validation.Field(sd.Email, validation.Required, is.Email),
-		validation.Field(sd.Password, validation.Required, validation.Min(8)),
-		validation.Field(sd.Firstname, validation.Required, validation.Min(2)),
-		validation.Field(sd.LastName, validation.Required, validation.Min(2)),
+func (sd signUpDto) Validate() error {
+	return validation.ValidateStruct(&sd,
+		validation.Field(&sd.Email, validation.Required, is.Email),
+		validation.Field(&sd.Password, validation.Required, validation.Length(8, 0)),
+		validation.Field(&sd.Firstname, validation.Required, validation.Length(2, 0)),
+		validation.Field(&sd.Lastname, validation.Required, validation.Length(2, 0)),
 	)
 }

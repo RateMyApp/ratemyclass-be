@@ -20,11 +20,11 @@ func (ar *authRouter) registerRoute() gin.HandlerFunc {
 		ctx.ShouldBindJSON(&req)
 
 		// validation
-		if validationErrorCheck(&req, ctx) {
+		if validationErrorCheck(req, ctx) {
 			return
 		}
 
-		var command services.RegisterCommand = services.RegisterCommand{Email: req.Email, Password: req.Password, Firstname: req.Firstname, Lastname: req.LastName}
+		var command services.RegisterCommand = services.RegisterCommand{Email: req.Email, Password: req.Password, Firstname: req.Firstname, Lastname: req.Lastname}
 		err := ar.authService.RegisterUser(command)
 		if err != nil {
 			ctx.JSON(err.StatusCode, err)
