@@ -10,7 +10,7 @@ import (
 type HelloRouter struct {
 	ginRouter *gin.Engine
 }
-
+// handler function
 func (hr *HelloRouter) sayHelloRoute() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		var request requests.SayHelloRequest
@@ -26,14 +26,14 @@ func (hr *HelloRouter) sayHelloRoute() gin.HandlerFunc {
 		ctx.JSON(http.StatusOK, gin.H{"message": "hello"})
 	}
 }
-
+// add handler function to router group
 func (hr *HelloRouter) ExecRoutes() {
 	routerGroup := hr.ginRouter.RouterGroup
 	{
 		routerGroup.GET("/HELLO", hr.sayHelloRoute())
 	}
 }
-
+// factory method/constructor to create router
 func NewHelloRouter(ginRouter *gin.Engine) Router {
 	return &HelloRouter{ginRouter: ginRouter}
 }
