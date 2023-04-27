@@ -10,41 +10,42 @@ import (
 )
 
 type PostgresClient struct {
-	db               *gorm.DB
+	Db               *gorm.DB
 	connectionString string
 }
 
 func (pc *PostgresClient) Init() error {
 	db, err := gorm.Open(postgres.Open(pc.connectionString), &gorm.Config{})
-
 	if err != nil {
 		return err
 	}
 
-	pc.db = db
+	pc.Db = db
 
 	// migrations
 
 	tables := []interface{}{
 		&models.School{},
 		&models.Program{},
+		&models.User{},
+		&models.Course{},
+		&models.CourseRating{},
+		&models.Professor{},
 	}
 
 	for _, table := range tables {
 
-		err := pc.db.AutoMigrate(table)
+		err := pc.Db.AutoMigrate(table)
 		if err != nil {
 			return err
 		}
 	}
 
 	return nil
-
 }
 
 func (pc *PostgresClient) Close(ctx context.Context) error {
-	postgresDb, err := pc.db.DB()
-
+	postgresDb, err := pc.Db.DB()
 	if err != nil {
 		return err
 	}
@@ -53,7 +54,7 @@ func (pc *PostgresClient) Close(ctx context.Context) error {
 	return nil
 }
 
-func NewPostgresClient(appConfig config.AppConfig) DbClient {
-
-	return &PostgresClient{connectionString: appConfig.POSTGRES_URI}
+func NewPostgresClient(appConfig config.AppConfig) (DbClient, *PostgresClient) {
+	client := &PostgresClient{connectionString: appConfig.POSTGRES_URI}
+	return client, client
 }

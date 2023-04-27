@@ -9,5 +9,6 @@ type CourseRating struct {
 	DifficultyRating float32
 	Review           string
 	CourseID         uint
-	// StudentID uint
+	UserID           uint
+	isAnonymous      bool
 }

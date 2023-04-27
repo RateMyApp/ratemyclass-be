@@ -35,7 +35,7 @@ func (ar *authRouter) registerRoute() gin.HandlerFunc {
 }
 
 func (ar *authRouter) ExecRoutes() {
-	routerGroup := ar.ginRouter.RouterGroup
+	routerGroup := ar.ginRouter.Group("/api/v1/auth")
 	{
 		routerGroup.POST("/register", ar.registerRoute())
 	}

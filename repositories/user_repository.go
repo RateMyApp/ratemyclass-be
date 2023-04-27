@@ -16,7 +16,7 @@ type UserRepository interface {
 }
 
 type UserRepositoryPostgresImpl struct {
-	postgresClient dao.PostgresClient
+	postgresClient *dao.PostgresClient
 }
 
 func (ur *UserRepositoryPostgresImpl) FindUserByEmail(email string) (*models.User, *exceptions.AppError) {
@@ -45,6 +45,6 @@ func (ur *UserRepositoryPostgresImpl) SaveUser(user models.User) *exceptions.App
 	return nil
 }
 
-func NewUserRepository(postgresClient dao.PostgresClient) UserRepository {
+func NewUserRepository(postgresClient *dao.PostgresClient) UserRepository {
 	return &UserRepositoryPostgresImpl{postgresClient: postgresClient}
 }

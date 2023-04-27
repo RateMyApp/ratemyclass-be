@@ -6,7 +6,6 @@ type Course struct {
 	gorm.Model
 	Name         string
 	Units        float32
-	Professor    []Professor `gorm:"many2many:professor_courses"`
-	User         []*User `gorm:"many2many:course_students"`
+	Professor    []*Professor `gorm:"many2many:professor_courses"`
 	CourseRating []CourseRating
 }

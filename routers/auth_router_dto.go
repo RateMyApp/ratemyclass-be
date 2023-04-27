@@ -12,7 +12,7 @@ type signUpDto struct {
 	LastName  string
 }
 
-func (sd *signUpDto) Validation() error {
+func (sd *signUpDto) Validate() error {
 	return validation.ValidateStruct(sd,
 		validation.Field(sd.Email, validation.Required, is.Email),
 		validation.Field(sd.Password, validation.Required, validation.Min(8)),
