@@ -1,14 +1,21 @@
 name: Audit
 env:
+<<<<<<< HEAD
   PORT: 2000
   GO_ENV: "testing"
   POSTGRES_URI: "postgres://test:test@localhost:5432/ratemyclasstest?sslmode=disable"
+=======
+    PORT: 2000
+    GO_ENV: "testing"
+    POSTGRES_URI: "postgres://test:test@localhost:5432/ratemyclasstest?sslmode=disable"
+>>>>>>> 55a95db9003aa745f4b254a6cb0a399ba5c23e8b
 on:
   pull_request:
     branches: [master]
   push:
     branches: ["*"]
 jobs:
+<<<<<<< HEAD
   audit:
     runs-on: ubuntu-20.04
     steps:
@@ -53,3 +60,49 @@ jobs:
               echo "Failed"
               exit 1
           fi
+=======
+    audit:
+        runs-on: ubuntu-20.04
+        steps:
+            - uses: actions/checkout@v3
+            - name: Setup PostgreSQL
+            # You may pin to the exact commit or the version.
+            # uses: Harmon758/postgresql-action@0be19fa37850b22cb4c9bbf28a03abbf44abd863
+              uses: Harmon758/postgresql-action@v1.0.0
+              with:
+                postgresql db: ratemyclasstest
+                postgresql user: test
+                # POSTGRES_PASSWORD - superuser password
+                postgresql password: test
+            - name: Set up Go
+              uses: actions/setup-go@v3
+              with:
+                  go-version: 1.18
+            - name: Install dependencies
+              run: go get .
+            - name: Verify dependencies
+              run: go mod verify
+            - name: Build
+              run: go build
+            - name: Run go vet
+              run: go vet ./...
+            - name: Unit tests
+              run: |
+                  go test ./... -coverprofile=coverage.out 
+                  go tool cover -func=coverage.out
+            - name: Quality Gate - Test coverage shall be above threshold
+              env:
+                  TESTCOVERAGE_THRESHOLD: 70
+              run: |
+                  echo "Quality Gate: checking test coverage is above threshold ..."
+                  echo "Threshold             : $TESTCOVERAGE_THRESHOLD %"
+                  totalCoverage=`go tool cover -func=coverage.out | grep total | grep -Eo '[0-9]+\.[0-9]+'`
+                  echo "Current test coverage : $totalCoverage %"
+                  if (( $(echo "$totalCoverage $TESTCOVERAGE_THRESHOLD" | awk '{print ($1 > $2)}') )); then
+                      echo "OK"
+                  else
+                      echo "Current test coverage is below threshold. Please add more unit tests or adjust threshold to a lower value."
+                      echo "Failed"
+                      exit 1
+                  fi
+>>>>>>> 55a95db9003aa745f4b254a6cb0a399ba5c23e8b
