@@ -18,21 +18,34 @@ func Test_AppConfig_ShouldPanic_WhenNoEnvIsPresent(t *testing.T) {
 
 	fieldsNo := reflectElem.NumField()
 
+	originalValues := make(map[string]string)
+
 	for i := 0; i < fieldsNo; i++ {
 		field := reflectElem.Type().Field(i).Name
 		log.Println(field)
 		if field == "GO_ENV" {
+			originalValues["GO_ENV"] = "testing"
 			continue
 		}
-		os.Setenv(field, "")
+		val, ok := os.LookupEnv(field)
+		if ok {
+			originalValues[field] = val
+			os.Setenv(field, "")
+		}
 	}
 
 	defer func() {
+		r := recover()
 		for i := 0; i < fieldsNo; i++ {
 			field := reflectElem.Type().Field(i).Name
-			os.Unsetenv(field)
+
+			_, ok := os.LookupEnv(field)
+			if ok {
+				os.Setenv(field, originalValues[field])
+			}
 		}
-		if r := recover(); r == nil {
+		log.Println(originalValues)
+		if r == nil {
 			t.Errorf("Did not panic")
 		}
 	}()
