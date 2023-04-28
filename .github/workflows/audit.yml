@@ -1,4 +1,8 @@
 name: Audit
+env:
+    PORT: 2000
+    GO_ENV: "testing"
+    POSTGRES_URI: "postgres://test:test@localhost:5432/ratemyclasstest?sslmode=disable"
 on:
     pull_request:
         branches: [master]
@@ -9,6 +13,15 @@ jobs:
         runs-on: ubuntu-20.04
         steps:
             - uses: actions/checkout@v3
+            - name: Setup PostgreSQL
+            # You may pin to the exact commit or the version.
+            # uses: Harmon758/postgresql-action@0be19fa37850b22cb4c9bbf28a03abbf44abd863
+              uses: Harmon758/postgresql-action@v1.0.0
+              with:
+                postgresql db: ratemyclasstest
+                postgresql user: test
+                # POSTGRES_PASSWORD - superuser password
+                postgresql password: test
             - name: Set up Go
               uses: actions/setup-go@v3
               with:
