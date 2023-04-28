@@ -23,7 +23,7 @@ func (ac AppConfig) String() string {
 
 func getenv(key string) string {
 	value, ok := os.LookupEnv(key)
-	if !ok {
+	if !ok || value == "" {
 		log.Panicf("Could not find environment variable with key: %v", key)
 	}
 

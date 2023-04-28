@@ -3,6 +3,7 @@ package config_test
 import (
 	"log"
 	"os"
+	"reflect"
 	"testing"
 
 	"github.com/ratemyapp/config"
@@ -12,8 +13,25 @@ import (
 func Test_AppConfig_ShouldPanic_WhenNoEnvIsPresent(t *testing.T) {
 	// log.Println("hello")
 	os.Setenv("GO_ENV", "asdfasdfahfdkja")
+
+	reflectElem := reflect.ValueOf(config.AppConfig{})
+
+	fieldsNo := reflectElem.NumField()
+
+	for i := 0; i < fieldsNo; i++ {
+		field := reflectElem.Type().Field(i).Name
+		log.Println(field)
+		if field == "GO_ENV" {
+			continue
+		}
+		os.Setenv(field, "")
+	}
+
 	defer func() {
-		os.Setenv("GO_ENV", "testing")
+		for i := 0; i < fieldsNo; i++ {
+			field := reflectElem.Type().Field(i).Name
+			os.Unsetenv(field)
+		}
 		if r := recover(); r == nil {
 			t.Errorf("Did not panic")
 		}
