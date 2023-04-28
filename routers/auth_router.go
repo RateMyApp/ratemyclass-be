@@ -24,6 +24,7 @@ func (ar *authRouter) registerRoute() gin.HandlerFunc {
 			return
 		}
 
+		// register command
 		var command services.RegisterCommand = services.RegisterCommand{Email: req.Email, Password: req.Password, Firstname: req.Firstname, Lastname: req.Lastname}
 		err := ar.authService.RegisterUser(command)
 		if err != nil {

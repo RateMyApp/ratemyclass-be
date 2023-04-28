@@ -7,6 +7,7 @@ import (
 	"github.com/ratemyapp/models"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
 )
 
 type PostgresClient struct {
@@ -15,7 +16,7 @@ type PostgresClient struct {
 }
 
 func (pc *PostgresClient) Init() error {
-	db, err := gorm.Open(postgres.Open(pc.connectionString), &gorm.Config{})
+	db, err := gorm.Open(postgres.Open(pc.connectionString), &gorm.Config{Logger: logger.Default.LogMode(logger.Silent)})
 	if err != nil {
 		return err
 	}
@@ -24,18 +25,9 @@ func (pc *PostgresClient) Init() error {
 
 	// migrations
 
-	tables := []interface{}{
-		&models.School{},
-		&models.Program{},
-		&models.User{},
-		&models.Course{},
-		&models.CourseRating{},
-		&models.Professor{},
-	}
+	for _, model := range *models.GetModels() {
 
-	for _, table := range tables {
-
-		err := pc.Db.AutoMigrate(table)
+		err := pc.Db.AutoMigrate(model)
 		if err != nil {
 			return err
 		}

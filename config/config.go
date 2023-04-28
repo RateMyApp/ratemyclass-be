@@ -4,10 +4,11 @@ import (
 	"encoding/json"
 	"log"
 	"os"
+	"regexp"
+
 	"github.com/joho/godotenv"
 	"go.uber.org/fx"
 )
-
 
 type AppConfig struct {
 	PORT         string
@@ -35,13 +36,17 @@ func InitAppConfig() AppConfig {
 	if env == "" {
 		env = "development"
 	}
+	projectDirName := "ratemyclass-be"
+	re := regexp.MustCompile(`^(.*` + projectDirName + `)`)
+	cwd, _ := os.Getwd()
+	rootPath := re.Find([]byte(cwd))
 
-	err := godotenv.Load(".env." + env)
+	err := godotenv.Load(string(rootPath) + "/.env." + env)
 	if err != nil {
-		log.Println("Could not load .env file. Using os environments")
+		log.Printf("Could not load .env.%v file. Using os environments", env)
 	}
 
 	return AppConfig{PORT: getenv("PORT"), GO_ENV: env, POSTGRES_URI: getenv("POSTGRES_URI")}
 }
-var Module = fx.Module("config", fx.Provide(InitAppConfig))
 
+var Module = fx.Module("config", fx.Provide(InitAppConfig))
