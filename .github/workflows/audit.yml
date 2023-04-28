@@ -1,6 +1,6 @@
 name: Audit
 env:
-  PORT: 2000
+  PORT: "2000"
   GO_ENV: "testing"
   POSTGRES_URI: "postgres://test:test@localhost:5432/ratemyclasstest?sslmode=disable"
 on:
