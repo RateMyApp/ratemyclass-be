@@ -12,7 +12,7 @@ import (
 
 type UserRepository interface {
 	FindUserByEmail(email string) (*models.User, *exceptions.AppError)
-	SaveUser(models.User) *exceptions.AppError
+	SaveUser(user models.User) *exceptions.AppError
 }
 
 type UserRepositoryPostgresImpl struct {

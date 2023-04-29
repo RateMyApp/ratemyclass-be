@@ -2,7 +2,6 @@ package repositories_test
 
 import (
 	"context"
-	"log"
 	"os"
 	"testing"
 
@@ -52,17 +51,18 @@ func afterAll() {
 func Test_FindUserByEmail_ReturnUser_WhenGivenAValidEmail(t *testing.T) {
 	beforeEach()
 	defer afterEach()
+	assert := assert.New(t)
 	user, err := userRepostory.FindUserByEmail(testUser.Email)
-	if err != nil {
-		log.Println("hello again")
-		t.Error(err)
-	}
-	if user == nil {
-		t.Errorf("Expected User to not be nil")
-	}
-	if user.Email != testUser.Email {
-		t.Errorf("Expect %v but got %v", testUser.Email, user.Email)
-	}
+
+	assert.Nil(err, "FindUserByEmail Error: Expected err to be nil")
+	assert.NotNil(user, "FindUserByEmail Error: Expected user to not be nil")
+	assert.NotEmpty(user.CreatedAt)
+	assert.NotEmpty(user.UpdatedAt)
+	assert.False(user.DeletedAt.Valid)
+	assert.Equal(testUser.Password, user.Password)
+	assert.Equal(testUser.Email, user.Email)
+	assert.Equal(testUser.Firstname, user.Firstname)
+	assert.Equal(testUser.Lastname, user.Lastname)
 }
 
 func Test_FindUserByEmail_ReturnNil_WhenGivenInvalidEmail(t *testing.T) {
@@ -73,6 +73,25 @@ func Test_FindUserByEmail_ReturnNil_WhenGivenInvalidEmail(t *testing.T) {
 	user, err := userRepostory.FindUserByEmail("notfound@gmail.com")
 	assert.Nil(user, "FindUserByEmail Error: Expected user to be Nil")
 	assert.Nil(err, "FindUserByEmail Error: Expected err to be Nil")
+}
+
+func Test_SaveUser_ReturnNil_WhenGivenAUserToSave(t *testing.T) {
+	beforeEach()
+	defer afterEach()
+	assert := assert.New(t)
+
+	newUser := models.User{Firstname: "TestFirstname", Lastname: "TestLastname", Email: "Test@email.com", Password: "Testpassword"}
+
+	err := userRepostory.SaveUser(newUser)
+	assert.Nil(err, "SaveUser Error: Expected SaveUser to return no Error")
+
+	foundUser, err := userRepostory.FindUserByEmail(newUser.Email)
+	assert.NotNil(foundUser)
+	assert.Nil(err)
+	assert.Equal(newUser.Lastname, foundUser.Lastname)
+	assert.Equal(newUser.Firstname, foundUser.Firstname)
+	assert.Equal(newUser.Email, foundUser.Email)
+	assert.Equal(newUser.Password, foundUser.Password)
 }
 
 func TestMain(m *testing.M) {
