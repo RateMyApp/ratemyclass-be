@@ -2,7 +2,6 @@ package routers
 
 import (
 	// "encoding/json"
-	"log"
 
 	"github.com/gin-gonic/gin"
 	validation "github.com/go-ozzo/ozzo-validation"
@@ -34,7 +33,6 @@ var Module = fx.Module("routers",
 func validationErrorCheck(dto validation.Validatable, ctx *gin.Context) bool {
 	err := dto.Validate()
 	if err != nil {
-		log.Println(err)
 		appError := exceptions.NewBadRequestError(err)
 		ctx.JSON(appError.StatusCode, appError)
 		return true

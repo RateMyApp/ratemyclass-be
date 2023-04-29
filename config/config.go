@@ -1,7 +1,6 @@
 package config
 
 import (
-	"encoding/json"
 	"log"
 	"os"
 	"regexp"
@@ -16,10 +15,10 @@ type AppConfig struct {
 	GO_ENV       string
 }
 
-func (ac AppConfig) String() string {
-	jsonRep, _ := json.Marshal(ac)
-	return string(jsonRep)
-}
+// func (ac AppConfig) String() string {
+// 	jsonRep, _ := json.Marshal(ac)
+// 	return string(jsonRep)
+// }
 
 func getenv(key string) string {
 	value, ok := os.LookupEnv(key)
