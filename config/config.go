@@ -13,6 +13,8 @@ type AppConfig struct {
 	PORT         string
 	POSTGRES_URI string
 	GO_ENV       string
+	JWT_SECRET   string
+	TIME         string
 }
 
 // func (ac AppConfig) String() string {
@@ -45,7 +47,7 @@ func InitAppConfig() AppConfig {
 		log.Printf("Could not load .env.%v file. Using os environments", env)
 	}
 
-	return AppConfig{PORT: getenv("PORT"), GO_ENV: env, POSTGRES_URI: getenv("POSTGRES_URI")}
+	return AppConfig{PORT: getenv("PORT"), GO_ENV: env, POSTGRES_URI: getenv("POSTGRES_URI"), JWT_SECRET: getenv("JWT_SECRET"), TIME: getenv("TIME")}
 }
 
 var Module = fx.Module("config", fx.Provide(InitAppConfig))

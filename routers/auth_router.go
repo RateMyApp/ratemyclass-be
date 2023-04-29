@@ -34,7 +34,30 @@ func (ar *authRouter) registerRoute() gin.HandlerFunc {
 		ctx.JSON(http.StatusCreated, gin.H{"message": "User Registration Successful!!!"})
 	}
 }
+//login route
+func(ar *authRouter) loginRoute() gin.HandlerFunc{
+	return func(ctx *gin.Context){
+		var req loginDto
 
+		ctx.BindJSON(&req)
+
+		var command services.LoginCommand = services.LoginCommand{Email: req.Email, Password: req.Password}
+		
+		err,user:= ar.authService.CheckLogin(command)
+		//error found
+		if err!= nil{
+			ctx.JSON(err.StatusCode,err)
+		}
+		var resp services.UserDetails
+		//login unsuccesful, empty struct
+		if user ==resp{
+			ctx.JSON(http.StatusOK,gin.H{"message:": "Login Unsuccessful"})
+		}else{
+			//create jwtToken
+		
+		}
+	}
+}
 func (ar *authRouter) ExecRoutes() {
 	routerGroup := ar.ginRouter.Group("/api/v1/auth")
 	{
