@@ -27,8 +27,6 @@ func beforeAll() {
 	_, client := dao.NewPostgresClient(appConfig)
 	postgresClient = client
 	postgresClient.Init()
-	testUser = models.User{Email: "test@gmail.com", Firstname: "Test1", Lastname: "TestTwo", Password: "hello123"}
-	postgresClient.Db.Create(&testUser)
 	userRepostory = repositories.NewUserRepository(postgresClient)
 }
 
@@ -51,6 +49,8 @@ func afterAll() {
 func Test_FindUserByEmail_ReturnUser_WhenGivenAValidEmail(t *testing.T) {
 	beforeEach()
 	defer afterEach()
+	testUser = models.User{Email: "test@gmail.com", Firstname: "Test1", Lastname: "TestTwo", Password: "hello123"}
+	postgresClient.Db.Create(&testUser)
 	assert := assert.New(t)
 	user, err := userRepostory.FindUserByEmail(testUser.Email)
 
