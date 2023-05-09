@@ -109,6 +109,24 @@ func (self *ProfessorRouteTestSuite) Test_CreateProfRoute_ShouldReturnStatus400_
 	self.Equal(http.StatusBadRequest, w.Result().StatusCode)
 }
 
+func (self *ProfessorRouteTestSuite) Test_CreateProfRoute_ShouldReturnStatus400_WhenGivenAnInvalidDirectoryListing() {
+	w := httptest.NewRecorder()
+
+	body, _ := json.Marshal(map[string]interface{}{
+		"firstname":        "Firstname",
+		"lastname":         "Lastname",
+		"directoryListing": "testcom",
+		"email":            "test@gmail.com",
+		"department":       "English",
+	})
+
+	req, _ := http.NewRequest("POST", "/api/v1/prof", bytes.NewReader(body))
+
+	self.ginRouter.ServeHTTP(w, req)
+
+	self.Equal(http.StatusBadRequest, w.Result().StatusCode)
+}
+
 func TestProfessorRouteTestSuite(t *testing.T) {
 	suite.Run(t, new(ProfessorRouteTestSuite))
 }
