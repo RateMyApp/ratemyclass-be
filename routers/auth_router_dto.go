@@ -11,7 +11,16 @@ type signUpDto struct {
 	Firstname string `json:"firstname"`
 	Lastname  string `json:"lastname"`
 }
+type loginDto struct{
+	Email string `json:"email"`
+	Password string `json:"password"`
+}
 
+type UserDetailsdto struct {
+	Firstname    string
+	Lastname     string
+	Email        string
+}
 func (sd signUpDto) Validate() error {
 	return validation.ValidateStruct(&sd,
 		validation.Field(&sd.Email, validation.Required, is.Email),

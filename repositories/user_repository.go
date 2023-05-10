@@ -12,7 +12,7 @@ import (
 
 type UserRepository interface {
 	FindUserByEmail(email string) (*models.User, *exceptions.AppError)
-	SaveUser(user models.User) *exceptions.AppError
+	SaveUser(models.User) *exceptions.AppError
 }
 
 type UserRepositoryPostgresImpl struct {
@@ -44,6 +44,7 @@ func (ur *UserRepositoryPostgresImpl) SaveUser(user models.User) *exceptions.App
 
 	return nil
 }
+
 
 func NewUserRepository(postgresClient *dao.PostgresClient) UserRepository {
 	return &UserRepositoryPostgresImpl{postgresClient: postgresClient}
