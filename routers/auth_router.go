@@ -48,6 +48,7 @@ func (ar *authRouter) loginRoute() gin.HandlerFunc {
 		//error found
 		if err != nil {
 			ctx.JSON(err.StatusCode, err)
+			return
 		}
 		var resp services.UserDetails
 		// incorrect password
