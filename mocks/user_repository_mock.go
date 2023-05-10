@@ -1,0 +1,43 @@
+package mocks
+
+import (
+	"github.com/ratemyapp/exceptions"
+	"github.com/ratemyapp/models"
+	"github.com/stretchr/testify/mock"
+)
+
+type UserRepositoryMock struct {
+	mock.Mock
+}
+
+func (ur *UserRepositoryMock) FindUserByEmail(email string) (*models.User, *exceptions.AppError) {
+	args := ur.Called(email)
+	var arg0 *models.User
+	var arg1 *exceptions.AppError
+
+	if val, ok := args.Get(0).(*models.User); ok {
+		arg0 = val
+	} else {
+		arg0 = nil
+	}
+	if val, ok := args.Get(1).(*exceptions.AppError); ok {
+		arg1 = val
+	} else {
+		arg1 = nil
+	}
+
+	return arg0, arg1
+}
+
+func (ur *UserRepositoryMock) SaveUser(user models.User) *exceptions.AppError {
+	args := ur.Called(user)
+
+	var arg0 *exceptions.AppError
+	if val, ok := args.Get(0).(*exceptions.AppError); ok {
+		arg0 = val
+	} else {
+		arg0 = nil
+	}
+
+	return arg0
+}

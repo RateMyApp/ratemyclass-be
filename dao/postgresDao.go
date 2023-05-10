@@ -7,44 +7,37 @@ import (
 	"github.com/ratemyapp/models"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
 )
 
 type PostgresClient struct {
-	db               *gorm.DB
+	Db               *gorm.DB
 	connectionString string
 }
 
 func (pc *PostgresClient) Init() error {
-	db, err := gorm.Open(postgres.Open(pc.connectionString), &gorm.Config{})
-
+	db, err := gorm.Open(postgres.Open(pc.connectionString), &gorm.Config{Logger: logger.Default.LogMode(logger.Silent)})
 	if err != nil {
 		return err
 	}
 
-	pc.db = db
+	pc.Db = db
 
 	// migrations
 
-	tables := []interface{}{
-		&models.School{},
-		&models.Program{},
-	}
+	for _, model := range *models.GetModels() {
 
-	for _, table := range tables {
-
-		err := pc.db.AutoMigrate(table)
+		err := pc.Db.AutoMigrate(model)
 		if err != nil {
 			return err
 		}
 	}
 
 	return nil
-
 }
 
 func (pc *PostgresClient) Close(ctx context.Context) error {
-	postgresDb, err := pc.db.DB()
-
+	postgresDb, err := pc.Db.DB()
 	if err != nil {
 		return err
 	}
@@ -53,7 +46,7 @@ func (pc *PostgresClient) Close(ctx context.Context) error {
 	return nil
 }
 
-func NewPostgresClient(appConfig config.AppConfig) DbClient {
-
-	return &PostgresClient{connectionString: appConfig.POSTGRES_URI}
+func NewPostgresClient(appConfig config.AppConfig) (DbClient, *PostgresClient) {
+	client := &PostgresClient{connectionString: appConfig.POSTGRES_URI}
+	return client, client
 }
