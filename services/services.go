@@ -10,3 +10,4 @@ var Module = fx.Module("services", fx.Provide(
 		NewProfessorService, fx.As(new(ProfessorService)),
 	),
 ))
+

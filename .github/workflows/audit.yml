@@ -3,6 +3,8 @@ env:
   PORT: "2000"
   GO_ENV: "testing"
   POSTGRES_URI: "postgres://test:test@localhost:5432/ratemyclasstest?sslmode=disable"
+  JWT_SECRET: "signedkey"
+  TIME: 10
 on:
   pull_request:
     branches: [master]
