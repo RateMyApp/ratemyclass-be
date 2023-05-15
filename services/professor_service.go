@@ -15,7 +15,7 @@ type ProfessorServiceImpl struct {
 }
 
 func (ps *ProfessorServiceImpl) CreateProfessor(command CreateProfessorCommand) *exceptions.AppError {
-	professor := models.Professor{Email: command.Email, DirectoryListing: command.DirectoryListing, Lastname: command.Lastname, Firstname: command.Firstname}
+	professor := models.Professor{Email: command.Email, DirectoryListing: command.DirectoryListing, Lastname: command.Lastname, Firstname: command.Firstname, Status: models.PENDING}
 	return ps.repo.SaveProfessor(professor)
 }
 
