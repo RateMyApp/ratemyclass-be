@@ -25,7 +25,7 @@ type UserRepositorySuite struct {
 func (suite *UserRepositorySuite) SetupSuite() {
 	os.Setenv("GO_ENV", "testing")
 	suite.appConfig = config.InitAppConfig()
-	client := dao.NewPostgresClient(suite.appConfig)
+	_, client := dao.NewPostgresClient(suite.appConfig)
 	suite.postgresClient = client
 	suite.postgresClient.Init()
 	suite.userRepostory = repositories.NewUserRepository(suite.postgresClient)

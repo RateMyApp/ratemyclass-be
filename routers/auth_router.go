@@ -45,7 +45,7 @@ func (ar *authRouter) loginRoute() gin.HandlerFunc {
 		var command services.LoginCommand = services.LoginCommand{Email: req.Email, Password: req.Password}
 
 		err, user := ar.authService.CheckLogin(command)
-		//error found
+		// error found
 		if err != nil {
 			ctx.JSON(err.StatusCode, err)
 			return
@@ -55,12 +55,13 @@ func (ar *authRouter) loginRoute() gin.HandlerFunc {
 		if user == resp {
 			ctx.JSON(http.StatusUnauthorized, gin.H{"message:": "Incorrect Password"})
 		} else {
-			//create jwtToken
+			// create jwtToken
 			tokenString, _ := ar.authService.GenerateJWTtoken(user)
 			ctx.JSON(http.StatusOK, tokenString)
 		}
 	}
 }
+
 func (ar *authRouter) ExecRoutes() {
 	routerGroup := ar.ginRouter.Group("/api/v1/auth")
 	{

@@ -33,7 +33,7 @@ var (
 func beforeAll() {
 	os.Setenv("GO_ENV", "testing")
 	appConfig = config.InitAppConfig()
-	client := dao.NewPostgresClient(appConfig)
+	_, client := dao.NewPostgresClient(appConfig)
 	postgresClient = client
 	postgresClient.Init()
 	testUser = models.User{Email: "test@gmail.com", Firstname: "Test1", Lastname: "TestTwo", Password: "hello123"}

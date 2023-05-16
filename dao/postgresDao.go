@@ -50,9 +50,9 @@ func (pc *PostgresClient) Close(ctx context.Context) error {
 	return nil
 }
 
-func NewPostgresClient(appConfig config.AppConfig) *PostgresClient {
+func NewPostgresClient(appConfig config.AppConfig) (DbClient, *PostgresClient) {
 	client := &PostgresClient{connectionString: appConfig.POSTGRES_URI}
-	return client
+	return client, client
 }
 
 var _ DbClient = (*PostgresClient)(nil)
