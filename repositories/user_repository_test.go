@@ -24,11 +24,11 @@ type UserRepositorySuite struct {
 
 func (suite *UserRepositorySuite) SetupSuite() {
 	os.Setenv("GO_ENV", "testing")
-	appConfig = config.InitAppConfig()
-	_, client := dao.NewPostgresClient(appConfig)
-	postgresClient = client
-	postgresClient.Init()
-	userRepostory = repositories.NewUserRepository(postgresClient)
+	suite.appConfig = config.InitAppConfig()
+	client := dao.NewPostgresClient(suite.appConfig)
+	suite.postgresClient = client
+	suite.postgresClient.Init()
+	suite.userRepostory = repositories.NewUserRepository(suite.postgresClient)
 }
 
 func (suite *UserRepositorySuite) SetupTest() {
@@ -47,24 +47,20 @@ func (suite *UserRepositorySuite) TearDownSuite() {
 	suite.postgresClient.Close(ctx)
 }
 
-func Test_FindUserByEmail_ReturnUser_WhenGivenAValidEmail(t *testing.T) {
-	beforeEach()
-	defer afterEach()
-	testUser = models.User{Email: "test@gmail.com", Firstname: "Test1", Lastname: "TestTwo", Password: "hello123"}
-	postgresClient.Db.Create(&testUser)
-	assert := assert.New(t)
-	user, err := userRepostory.FindUserByEmail(testUser.Email)
+func (suite *UserRepositorySuite) Test_FindUserByEmail_ReturnUser_WhenGivenAValidEmail() {
+	testUser := models.User{Email: "test@gmail.com", Firstname: "Test1", Lastname: "TestTwo", Password: "hello123"}
+	suite.postgresClient.Db.Create(&testUser)
+	user, err := suite.userRepostory.FindUserByEmail(testUser.Email)
 
-	assert.Nil(err, "FindUserByEmail Error: Expected err to be nil")
-	assert.NotNil(user, "FindUserByEmail Error: Expected user to not be nil")
-	assert.NotEmpty(user.CreatedAt)
-	assert.NotEmpty(user.UpdatedAt)
-	assert.False(user.DeletedAt.Valid)
-	assert.Equal(testUser.Password, user.Password)
-	assert.Equal(testUser.Email, user.Email)
-	assert.Equal(testUser.Firstname, user.Firstname)
-	assert.Equal(testUser.Lastname, user.Lastname)
-
+	suite.Nil(err, "FindUserByEmail Error: Expected err to be nil")
+	suite.NotNil(user, "FindUserByEmail Error: Expected user to not be nil")
+	suite.NotEmpty(user.CreatedAt)
+	suite.NotEmpty(user.UpdatedAt)
+	suite.False(user.DeletedAt.Valid)
+	suite.Equal(testUser.Password, user.Password)
+	suite.Equal(testUser.Email, user.Email)
+	suite.Equal(testUser.Firstname, user.Firstname)
+	suite.Equal(testUser.Lastname, user.Lastname)
 }
 
 func (suite *UserRepositorySuite) Test_FindUserByEmail_ReturnNil_WhenGivenInvalidEmail() {

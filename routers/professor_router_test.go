@@ -33,10 +33,10 @@ type ProfessorRouteTestSuite struct {
 func (self *ProfessorRouteTestSuite) SetupSuite() {
 	os.Setenv("GO_ENV", "testing")
 	self.ginRouter = gin.Default()
-	_, postgresClient := dao.NewPostgresClient(config.InitAppConfig())
+	postgresClient := dao.NewPostgresClient(config.InitAppConfig())
 	self.client = postgresClient
 	self.client.Init()
-	self.professorRepo = repositories.NewProfessorRepository(*self.client)
+	self.professorRepo = repositories.NewProfessorRepository(self.client)
 	self.professorServ = services.NewProfessorService(self.professorRepo)
 	self.professorRouter = routers.NewProfessorRouter(self.ginRouter, self.professorServ)
 	self.professorRouter.ExecRoutes()

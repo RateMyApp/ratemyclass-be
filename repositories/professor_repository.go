@@ -13,7 +13,7 @@ type ProfessorRepository interface {
 }
 
 type ProfessorRepositoryImpl struct {
-	client dao.PostgresClient
+	client *dao.PostgresClient
 }
 
 func (pr *ProfessorRepositoryImpl) SaveProfessor(professor models.Professor) *exceptions.AppError {
@@ -26,6 +26,6 @@ func (pr *ProfessorRepositoryImpl) SaveProfessor(professor models.Professor) *ex
 	return nil
 }
 
-func NewProfessorRepository(client dao.PostgresClient) ProfessorRepository {
+func NewProfessorRepository(client *dao.PostgresClient) ProfessorRepository {
 	return &ProfessorRepositoryImpl{client: client}
 }

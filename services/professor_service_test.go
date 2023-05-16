@@ -31,10 +31,10 @@ type ProfessorServiceTestSuite struct {
 func (psts *ProfessorServiceTestSuite) SetupSuite() {
 	os.Setenv("GO_ENV", "testing")
 	appConfig = config.InitAppConfig()
-	_, psts.client = dao.NewPostgresClient(appConfig)
+	psts.client = dao.NewPostgresClient(appConfig)
 	psts.client.Init()
 	// normal setup
-	psts.professorRepo = repositories.NewProfessorRepository(*psts.client)
+	psts.professorRepo = repositories.NewProfessorRepository(psts.client)
 	psts.professorServ = services.NewProfessorService(psts.professorRepo)
 
 	// mock setup
