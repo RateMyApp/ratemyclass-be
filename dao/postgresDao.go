@@ -23,8 +23,12 @@ func (pc *PostgresClient) Init() error {
 
 	pc.Db = db
 
-	// migrations
+	// Initial setup
+	db.Exec(`
+        CREATE TYPE status AS ENUM ('PENDING', 'APPROVED', 'DECLINED');
+    `)
 
+	// migrations
 	for _, model := range *models.GetModels() {
 
 		err := pc.Db.AutoMigrate(model)
@@ -50,3 +54,5 @@ func NewPostgresClient(appConfig config.AppConfig) (DbClient, *PostgresClient) {
 	client := &PostgresClient{connectionString: appConfig.POSTGRES_URI}
 	return client, client
 }
+
+var _ DbClient = (*PostgresClient)(nil)

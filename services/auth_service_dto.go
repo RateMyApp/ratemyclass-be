@@ -8,12 +8,12 @@ type RegisterCommand struct {
 }
 
 type LoginCommand struct {
-	Email string
+	Email    string
 	Password string
 }
 
 type UserDetails struct {
-	Firstname    string
-	Lastname     string
-	Email        string
+	Firstname string
+	Lastname  string
+	Email     string
 }

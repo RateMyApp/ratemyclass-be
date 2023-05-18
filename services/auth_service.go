@@ -17,7 +17,7 @@ type AuthService interface {
 	RegisterUser(command RegisterCommand) *exceptions.AppError
 	CheckLogin(command LoginCommand) (*exceptions.AppError, UserDetails)
 	GenerateJWTtoken(command UserDetails) (string, error)
-	//VerifyJWTtoken(command UserDetails)
+	// VerifyJWTtoken(command UserDetails)
 }
 
 type AuthServiceImpl struct {
@@ -47,6 +47,7 @@ func (as *AuthServiceImpl) RegisterUser(command RegisterCommand) *exceptions.App
 	}
 	return nil
 }
+
 func (as *AuthServiceImpl) CheckLogin(command LoginCommand) (*exceptions.AppError, UserDetails) {
 	// check if email exists
 	existingUser, err := as.userRepo.FindUserByEmail(command.Email)
@@ -72,29 +73,28 @@ func (as *AuthServiceImpl) CheckLogin(command LoginCommand) (*exceptions.AppErro
 }
 
 func (as *AuthServiceImpl) GenerateJWTtoken(command UserDetails) (string, error) {
-
 	secretkey := config.InitAppConfig()
 	timeStr := secretkey.TIME
 	timeInt, _ := strconv.Atoi(timeStr)
 
-	//create new jwtToken
+	// create new jwtToken
 	token := jwt.New(jwt.SigningMethodEdDSA)
 	claims := token.Claims.(jwt.MapClaims)
 
-	//edit claims
+	// edit claims
 	claims["email"] = command.Email
 	claims["firstname"] = command.Firstname
 	claims["lastname"] = command.Lastname
 	claims["exp"] = time.Now().Add(time.Duration(timeInt) * time.Minute)
 
-	//sign the token
+	// sign the token
 	tokenString, err := token.SignedString(secretkey.JWT_SECRET)
 	return tokenString, err
-
 }
+
 func (as *AuthServiceImpl) VerifyJWTtoken() {
-
 }
+
 func NewAuthServiceImpl(userRepo repositories.UserRepository) AuthService {
 	return &AuthServiceImpl{userRepo: userRepo}
 }

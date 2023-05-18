@@ -16,5 +16,6 @@ var Module = fx.Module("dao",
 		fx.Annotate(
 			NewPostgresClient,
 			fx.As(new(DbClient)),
-		)),
+		),
+	),
 )

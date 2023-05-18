@@ -28,8 +28,6 @@ func (suite *UserRepositorySuite) SetupSuite() {
 	_, client := dao.NewPostgresClient(suite.appConfig)
 	suite.postgresClient = client
 	suite.postgresClient.Init()
-	suite.testUser = models.User{Email: "test@gmail.com", Firstname: "Test1", Lastname: "TestTwo", Password: "hello123"}
-	suite.postgresClient.Db.Create(&suite.testUser)
 	suite.userRepostory = repositories.NewUserRepository(suite.postgresClient)
 }
 
@@ -50,17 +48,19 @@ func (suite *UserRepositorySuite) TearDownSuite() {
 }
 
 func (suite *UserRepositorySuite) Test_FindUserByEmail_ReturnUser_WhenGivenAValidEmail() {
-	user, err := suite.userRepostory.FindUserByEmail(suite.testUser.Email)
+	testUser := models.User{Email: "test@gmail.com", Firstname: "Test1", Lastname: "TestTwo", Password: "hello123"}
+	suite.postgresClient.Db.Create(&testUser)
+	user, err := suite.userRepostory.FindUserByEmail(testUser.Email)
 
 	suite.Nil(err, "FindUserByEmail Error: Expected err to be nil")
 	suite.NotNil(user, "FindUserByEmail Error: Expected user to not be nil")
 	suite.NotEmpty(user.CreatedAt)
 	suite.NotEmpty(user.UpdatedAt)
 	suite.False(user.DeletedAt.Valid)
-	suite.Equal(suite.testUser.Password, user.Password)
-	suite.Equal(suite.testUser.Email, user.Email)
-	suite.Equal(suite.testUser.Firstname, user.Firstname)
-	suite.Equal(suite.testUser.Lastname, user.Lastname)
+	suite.Equal(testUser.Password, user.Password)
+	suite.Equal(testUser.Email, user.Email)
+	suite.Equal(testUser.Firstname, user.Firstname)
+	suite.Equal(testUser.Lastname, user.Lastname)
 }
 
 func (suite *UserRepositorySuite) Test_FindUserByEmail_ReturnNil_WhenGivenInvalidEmail() {
