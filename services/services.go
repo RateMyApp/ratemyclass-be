@@ -9,5 +9,8 @@ var Module = fx.Module("services", fx.Provide(
 	fx.Annotate(
 		NewProfessorService, fx.As(new(ProfessorService)),
 	),
+	fx.Annotate(
+		NewCourseRatingService, fx.As(new(CourseRatingService)),
+	),
 ))
 

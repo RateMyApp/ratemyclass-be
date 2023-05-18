@@ -10,5 +10,5 @@ type CourseRating struct {
 	Review           string
 	CourseID         uint
 	UserID           uint
-	isAnonymous      bool
+	IsAnonymous      bool
 }

@@ -29,6 +29,7 @@ var Module = fx.Module("routers",
 	fx.Provide(AsRouter(NewByeRouter)),
 	fx.Provide(AsRouter(NewAuthRouter)),
 	fx.Provide(AsRouter(NewProfessorRouter)),
+	fx.Provide(AsRouter(NewCourseRatingRouter)),
 )
 
 func validationErrorCheck(dto validation.Validatable, ctx *gin.Context) bool {
