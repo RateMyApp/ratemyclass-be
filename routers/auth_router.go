@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/ratemyapp/exceptions"
 	"github.com/ratemyapp/services"
 )
 
@@ -17,7 +18,11 @@ func (ar *authRouter) registerRoute() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		var req signUpDto
 
-		ctx.ShouldBindJSON(&req)
+		if err := ctx.ShouldBindJSON(&req); err != nil {
+			msg := exceptions.NewUnprocessableEntityError("Invalid JSON Provided")
+			ctx.JSON(msg.StatusCode, msg)
+			return
+		}
 
 		// validation
 		if validationErrorCheck(req, ctx) {

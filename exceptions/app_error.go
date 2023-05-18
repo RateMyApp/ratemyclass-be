@@ -6,9 +6,9 @@ import (
 )
 
 type AppError struct {
-	Message    interface{}
-	StatusCode int
-	TimeStamp  string
+	Message    interface{} `json:"message"`
+	StatusCode int         `json:"status"`
+	TimeStamp  string      `json:"timestamp"`
 }
 
 func NewInternalServerError() AppError {
@@ -39,6 +39,14 @@ func NewUnauthorizedError(message interface{}) AppError {
 	return AppError{
 		Message:    message,
 		StatusCode: http.StatusUnauthorized,
+		TimeStamp:  time.Now().UTC().Local().String(),
+	}
+}
+
+func NewUnprocessableEntityError(message interface{}) AppError {
+	return AppError{
+		Message:    message,
+		StatusCode: http.StatusUnprocessableEntity,
 		TimeStamp:  time.Now().UTC().Local().String(),
 	}
 }
