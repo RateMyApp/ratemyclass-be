@@ -8,7 +8,7 @@ var Module = fx.Module("utils", fx.Provide(
 		fx.As(new(JwtUtil)),
 	),
 	fx.Annotate(
-		NewTimeUtil(),
+		NewTimeUtil,
 		fx.As(new(TimeUtil)),
 	),
 ),

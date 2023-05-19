@@ -17,10 +17,8 @@ func (ar *authRouter) registerRoute() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		var req registerUserReq
 
-		ctx.ShouldBindJSON(&req)
-
 		// validation
-		if validationErrorCheck(req, ctx) {
+		if validationErrorCheck(&req, ctx) {
 			return
 		}
 
@@ -40,7 +38,10 @@ func (ar *authRouter) loginRoute() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		var req loginUserReq
 
-		ctx.BindJSON(&req)
+		// validation
+		if validationErrorCheck(&req, ctx) {
+			return
+		}
 
 		var command services.LoginCommand = services.LoginCommand{Email: req.Email, Password: req.Password}
 

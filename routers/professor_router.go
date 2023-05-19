@@ -16,9 +16,7 @@ func (pr *professorRouter) createProfRoute() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		var req CreateProfReq
 
-		ctx.ShouldBindJSON(&req)
-
-		if validationErrorCheck(req, ctx) {
+		if validationErrorCheck(&req, ctx) {
 			return
 		}
 

@@ -6,12 +6,12 @@ type TimeUtil interface {
 	GenerateTime(minutes uint) time.Time
 }
 
-type timeUtil struct{}
+type timeUtilImpl struct{}
 
-func (self timeUtil) GenerateTime(minutes uint) time.Time {
+func (self timeUtilImpl) GenerateTime(minutes uint) time.Time {
 	return time.Now().Add(time.Duration(minutes) * time.Minute)
 }
 
-func NewTimeUtil() timeUtil {
-	return timeUtil{}
+func NewTimeUtil() timeUtilImpl {
+	return timeUtilImpl{}
 }
