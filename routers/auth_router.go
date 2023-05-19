@@ -15,7 +15,7 @@ type authRouter struct {
 // register Route
 func (ar *authRouter) registerRoute() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		var req signUpDto
+		var req registerUserReq
 
 		ctx.ShouldBindJSON(&req)
 
@@ -38,27 +38,26 @@ func (ar *authRouter) registerRoute() gin.HandlerFunc {
 // login route
 func (ar *authRouter) loginRoute() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		var req loginDto
+		var req loginUserReq
 
 		ctx.BindJSON(&req)
 
 		var command services.LoginCommand = services.LoginCommand{Email: req.Email, Password: req.Password}
 
-		err, user := ar.authService.CheckLogin(command)
+		err, user := ar.authService.LoginUser(command)
 		// error found
 		if err != nil {
 			ctx.JSON(err.StatusCode, err)
 			return
 		}
-		var resp services.UserDetails
-		// incorrect password
-		if user == resp {
-			ctx.JSON(http.StatusUnauthorized, gin.H{"message:": "Incorrect Password"})
-		} else {
-			// create jwtToken
-			tokenString, _ := ar.authService.GenerateJWTtoken(user)
-			ctx.JSON(http.StatusOK, tokenString)
+
+		resp := loginUserResp{
+			Email:       user.Email,
+			Firstname:   user.Firstname,
+			Lastname:    user.Lastname,
+			AccessToken: user.AccessToken,
 		}
+		ctx.JSON(http.StatusOK, resp)
 	}
 }
 

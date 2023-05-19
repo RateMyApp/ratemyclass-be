@@ -13,7 +13,8 @@ type LoginCommand struct {
 }
 
 type UserDetails struct {
-	Firstname string
-	Lastname  string
-	Email     string
+	Firstname   string
+	Lastname    string
+	Email       string
+	AccessToken string
 }

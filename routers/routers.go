@@ -31,7 +31,8 @@ var Module = fx.Module("routers",
 	fx.Provide(AsRouter(NewProfessorRouter)),
 )
 
-func validationErrorCheck(dto validation.Validatable, ctx *gin.Context) bool {
+func validationErrorCheck(req *validation.Validatable, ctx *gin.Context) bool {
+	err := ctx.ShouldBindJSON(&req)
 	err := dto.Validate()
 	if err != nil {
 		appError := exceptions.NewBadRequestError(err)
