@@ -13,6 +13,7 @@ import (
 	"github.com/ratemyapp/models"
 	"github.com/ratemyapp/repositories"
 	"github.com/ratemyapp/services"
+	"github.com/ratemyapp/utils"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"golang.org/x/crypto/bcrypt"
@@ -32,16 +33,30 @@ var (
 
 func beforeAll() {
 	os.Setenv("GO_ENV", "testing")
+	// config
 	appConfig = config.InitAppConfig()
+
+	// db client
 	_, client := dao.NewPostgresClient(appConfig)
 	postgresClient = client
 	postgresClient.Init()
 	testUser = models.User{Email: "test@gmail.com", Firstname: "Test1", Lastname: "TestTwo", Password: "hello123"}
 	postgresClient.Db.Create(&testUser)
+
+	// repositories
 	userRepostory = repositories.NewUserRepository(postgresClient)
-	authService = services.NewAuthServiceImpl(userRepostory)
 	userRepositoryMock = new(mocks.UserRepositoryMock)
-	authServiceMock = services.NewAuthServiceImpl(userRepositoryMock)
+
+	// utils
+	timeUtil := utils.NewTimeUtil()
+	timeUtilMock := new(mocks.TimeUtilMock)
+	jwtUtil := utils.NewJwtUtil()
+
+	// services
+	jwtService := services.NewJwtService(appConfig, jwtUtil, timeUtil)
+	jwtServiceMock := services.NewJwtService(appConfig, jwtUtil, timeUtilMock)
+	authService = services.NewAuthServiceImpl(userRepostory, jwtService)
+	authServiceMock = services.NewAuthServiceImpl(userRepositoryMock, jwtServiceMock)
 }
 
 func beforeEach() {

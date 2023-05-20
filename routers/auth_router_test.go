@@ -12,38 +12,51 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/ratemyapp/config"
 	"github.com/ratemyapp/dao"
-	"github.com/ratemyapp/mocks"
 	"github.com/ratemyapp/models"
 	"github.com/ratemyapp/repositories"
 	"github.com/ratemyapp/routers"
 	"github.com/ratemyapp/services"
+	"github.com/ratemyapp/utils"
 	"github.com/stretchr/testify/assert"
 	"gorm.io/gorm"
 )
 
 var (
-	appConfig          config.AppConfig
-	postgresClient     *dao.PostgresClient
-	transaction        *gorm.DB
-	testUser           models.User
-	userRepostory      repositories.UserRepository
-	authService        services.AuthService
-	userRepositoryMock *mocks.UserRepositoryMock
-	authServiceMock    services.AuthService
-	ginRouter          *gin.Engine
-	authRouter         routers.Router
+	appConfig      config.AppConfig
+	postgresClient *dao.PostgresClient
+	transaction    *gorm.DB
+	testUser       models.User
+	userRepostory  repositories.UserRepository
+	authService    services.AuthService
+	ginRouter      *gin.Engine
+	authRouter     routers.Router
 )
 
 func beforeAll() {
 	os.Setenv("GO_ENV", "testing")
+
+	// config
 	appConfig = config.InitAppConfig()
+
+	// db client
 	_, client := dao.NewPostgresClient(appConfig)
 	postgresClient = client
 	postgresClient.Init()
 	testUser = models.User{Email: "test@gmail.com", Firstname: "Test1", Lastname: "TestTwo", Password: "hello123"}
 	postgresClient.Db.Create(&testUser)
+
+	// repositories
 	userRepostory = repositories.NewUserRepository(postgresClient)
-	authService = services.NewAuthServiceImpl(userRepostory)
+
+	// utils
+	timeUtil := utils.NewTimeUtil()
+	jwtUtil := utils.NewJwtUtil()
+
+	// services
+	jwtService := services.NewJwtService(appConfig, jwtUtil, timeUtil)
+	authService = services.NewAuthServiceImpl(userRepostory, jwtService)
+
+	// initialize router
 	gin.SetMode(gin.ReleaseMode)
 	ginRouter = gin.Default()
 	ginRouter.Use(gin.Recovery())
