@@ -70,6 +70,7 @@ func (ar *authRouter) ExecRoutes() {
 	}
 }
 
+// Initializes a new Router responsible for authentication
 func NewAuthRouter(ginRouter *gin.Engine, authService services.AuthService) Router {
 	return &authRouter{ginRouter, authService}
 }
