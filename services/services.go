@@ -12,4 +12,7 @@ var Module = fx.Module("services", fx.Provide(
 	fx.Annotate(
 		NewJwtService, fx.As(new(JwtService)),
 	),
+	fx.Annotate(
+		NewCourseService, fx.As(new(CourseService)),
+	),
 ))

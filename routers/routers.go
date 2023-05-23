@@ -31,6 +31,7 @@ var Module = fx.Module("routers",
 	fx.Provide(AsRouter(NewByeRouter)),
 	fx.Provide(AsRouter(NewAuthRouter)),
 	fx.Provide(AsRouter(NewProfessorRouter)),
+	fx.Provide(AsRouter(NewCourseRouter)),
 )
 
 // Requires an address to a request dto (e.g validationErrorCheck(&req)) and checks the following:
