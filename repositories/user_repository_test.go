@@ -18,7 +18,6 @@ type UserRepositorySuite struct {
 	appConfig      config.AppConfig
 	postgresClient *dao.PostgresClient
 	transaction    *gorm.DB
-	testUser       models.User
 	userRepostory  repositories.UserRepository
 }
 
