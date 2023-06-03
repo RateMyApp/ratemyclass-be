@@ -9,5 +9,5 @@ type Course struct {
 	Code         string
 	Professor    []*Professor `gorm:"many2many:professor_courses"`
 	CourseRating []CourseRating
-	SchoolID     uint
+	SchoolID     *uint
 }

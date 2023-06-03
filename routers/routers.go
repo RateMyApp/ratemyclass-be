@@ -27,8 +27,6 @@ func AsRouter(f interface{}) any {
 
 // create a module, and instantiate our newhelloRouter and NewbyeRouter objects, resolve all depedencies needed by both objects
 var Module = fx.Module("routers",
-	fx.Provide(AsRouter(NewHelloRouter)),
-	fx.Provide(AsRouter(NewByeRouter)),
 	fx.Provide(AsRouter(NewAuthRouter)),
 	fx.Provide(AsRouter(NewProfessorRouter)),
 	fx.Provide(AsRouter(NewCourseRouter)),

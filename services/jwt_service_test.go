@@ -25,36 +25,36 @@ type JwtServiceTestSuite struct {
 	jwtServiceMock services.JwtService
 }
 
-func (self *JwtServiceTestSuite) SetupTest() {
+func (jsts *JwtServiceTestSuite) SetupTest() {
 	os.Setenv("GO_ENV", "testing")
-	self.config = config.InitAppConfig()
-
+	jsts.config = config.InitAppConfig()
+			
 	// utils
-	self.timeUtil = utils.NewTimeUtil()
-	self.timeUtilMock = mocks.TimeUtilMock{}
-	self.jwtUtil = utils.NewJwtUtil()
-	self.jwtUtilMock = mocks.JwtUtilMock{}
+	jsts.timeUtil = utils.NewTimeUtil()
+	jsts.timeUtilMock = mocks.TimeUtilMock{}
+	jsts.jwtUtil = utils.NewJwtUtil()
+	jsts.jwtUtilMock = mocks.JwtUtilMock{}
 
 	// services
-	self.jwtService = services.NewJwtService(self.config, self.jwtUtil, self.timeUtil)
-	self.jwtServiceMock = services.NewJwtService(self.config, &self.jwtUtilMock, self.timeUtil)
+	jsts.jwtService = services.NewJwtService(jsts.config, jsts.jwtUtil, jsts.timeUtil)
+	jsts.jwtServiceMock = services.NewJwtService(jsts.config, &jsts.jwtUtilMock, jsts.timeUtil)
 }
 
-func (self *JwtServiceTestSuite) Test_GenerateAccessToken_ShouldReturnToken_WhenGivenCommand() {
+func (jsts *JwtServiceTestSuite) Test_GenerateAccessToken_ShouldReturnToken_WhenGivenCommand() {
 	command := services.GenerateTokenCommand{Firstname: "TestF", Lastname: "TestL", Email: "test@gmail.com"}
-	token, err := self.jwtService.GenerateAccessToken(command)
+	token, err := jsts.jwtService.GenerateAccessToken(command)
 
-	self.Nil(err)
-	self.NotEmpty(token)
+	jsts.Nil(err)
+	jsts.NotEmpty(token)
 }
 
-func (self *JwtServiceTestSuite) Test_GenerateAccessToken_ShouldErr_WhenGivenCommand() {
+func (jsts *JwtServiceTestSuite) Test_GenerateAccessToken_ShouldErr_WhenGivenCommand() {
 	command := services.GenerateTokenCommand{Firstname: "TestF", Lastname: "TestL", Email: "test@gmail.com"}
-	self.jwtUtilMock.On("GenerateJwtToken", mock.Anything, mock.Anything).Return("", errors.New("Failed Test"))
-	token, err := self.jwtServiceMock.GenerateAccessToken(command)
-	self.Empty(token)
-	self.NotNil(err)
-	self.Equal(err.StatusCode, http.StatusInternalServerError)
+	jsts.jwtUtilMock.On("GenerateJwtToken", mock.Anything, mock.Anything).Return("", errors.New("Failed Test"))
+	token, err := jsts.jwtServiceMock.GenerateAccessToken(command)
+	jsts.Empty(token)
+	jsts.NotNil(err)
+	jsts.Equal(err.StatusCode, http.StatusInternalServerError)
 }
 
 func TestJwtServiceTestSuite(t *testing.T) {

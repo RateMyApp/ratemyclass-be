@@ -7,7 +7,7 @@ import (
 )
 
 type CourseService interface {
-	// Saves Course within Database
+	// Saves Course within a Database
 	CreateCourse(CreateCourseCommand) *exceptions.AppError
 }
 
@@ -15,15 +15,19 @@ type courseServiceImpl struct {
 	courseRepo repositories.CourseRepository
 }
 
-func (self *courseServiceImpl) CreateCourse(command CreateCourseCommand) *exceptions.AppError {
+
+// Creates a course using the CreateCourseCommand
+func (csi *courseServiceImpl) CreateCourse(command CreateCourseCommand) *exceptions.AppError {
 	newCourse := models.Course{Name: command.Name, Units: float32(command.Units), Code: command.Code}
-	err := self.courseRepo.SaveCourse(newCourse)
+	err := csi.courseRepo.SaveCourse(newCourse)
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func NewCourseService() CourseService {
-	return &courseServiceImpl{}
+
+// Initialises a new Course Service Impl
+func NewCourseService(courseRepo repositories.CourseRepository) CourseService {
+	return &courseServiceImpl{courseRepo: courseRepo}
 }
