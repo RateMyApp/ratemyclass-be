@@ -12,54 +12,83 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/ratemyapp/config"
 	"github.com/ratemyapp/dao"
+	"github.com/ratemyapp/exceptions"
+	"github.com/ratemyapp/mocks"
 	"github.com/ratemyapp/models"
 	"github.com/ratemyapp/repositories"
 	"github.com/ratemyapp/routers"
 	"github.com/ratemyapp/services"
+	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/suite"
 	"gorm.io/gorm"
 )
 
 type ProfessorRouteTestSuite struct {
 	suite.Suite
-	professorRepo   repositories.ProfessorRepository
-	professorServ   services.ProfessorService
-	ginRouter       *gin.Engine
-	transaction     *gorm.DB
-	client          *dao.PostgresClient
-	professorRouter routers.Router
+
+	// db
+	transaction *gorm.DB
+	client      *dao.PostgresClient
+
+	// repo
+	professorRepo repositories.ProfessorRepository
+
+	// service
+	professorServ     services.ProfessorService
+	professorServMock mocks.ProfessorServiceMock
+
+	// router
+	professorRouter     routers.Router
+	professorRouterMock routers.Router
+	ginRouter           *gin.Engine
+	ginRouterMock       *gin.Engine
 }
 
-func (self *ProfessorRouteTestSuite) SetupSuite() {
+func (prts *ProfessorRouteTestSuite) SetupSuite() {
+	// config
 	os.Setenv("GO_ENV", "testing")
-	self.ginRouter = gin.Default()
+
+	// db
 	_, postgresClient := dao.NewPostgresClient(config.InitAppConfig())
-	self.client = postgresClient
-	self.client.Init()
-	self.professorRepo = repositories.NewProfessorRepository(self.client)
-	self.professorServ = services.NewProfessorService(self.professorRepo)
-	self.professorRouter = routers.NewProfessorRouter(self.ginRouter, self.professorServ)
-	self.professorRouter.ExecRoutes()
+	prts.client = postgresClient
+	prts.client.Init()
+
+	// repo
+	prts.professorRepo = repositories.NewProfessorRepository(prts.client)
+
+	// service 
+	prts.professorServ = services.NewProfessorService(prts.professorRepo)
+	prts.professorServMock = mocks.ProfessorServiceMock{}
+
+	// router
+	prts.ginRouter = gin.Default()
+	prts.ginRouterMock = gin.Default()
+	prts.professorRouter = routers.NewProfessorRouter(prts.ginRouter, prts.professorServ)
+	prts.professorRouterMock = routers.NewProfessorRouter(prts.ginRouterMock, &prts.professorServMock)
+
+	// execute routers
+	prts.professorRouter.ExecRoutes()
+	prts.professorRouterMock.ExecRoutes()
 }
 
-func (self *ProfessorRouteTestSuite) SetupTest() {
-	self.transaction = self.client.Db.Begin()
+func (prts *ProfessorRouteTestSuite) SetupTest() {
+	prts.transaction = prts.client.Db.Begin()
 }
 
-func (self *ProfessorRouteTestSuite) TearDownTest() {
-	self.transaction.Rollback()
+func (prts *ProfessorRouteTestSuite) TearDownTest() {
+	prts.transaction.Rollback()
 }
 
-func (self *ProfessorRouteTestSuite) TearDownSuite() {
+func (prts *ProfessorRouteTestSuite) TearDownSuite() {
 	for _, model := range *models.GetModels() {
-		self.client.Db.Unscoped().Where(" 1 = 1").Delete(model)
+		prts.client.Db.Unscoped().Where(" 1 = 1").Delete(model)
 	}
 
 	ctx := context.Background()
-	self.client.Close(ctx)
+	prts.client.Close(ctx)
 }
 
-func (self *ProfessorRouteTestSuite) Test_CreateProfRoute_ShouldReturnStatus400_WhenGivenInvalidRequest() {
+func (prts *ProfessorRouteTestSuite) Test_CreateProfRoute_ShouldReturnStatus400_WhenGivenInvalidRequest() {
 	w := httptest.NewRecorder()
 	body, _ := json.Marshal(map[string]interface{}{
 		"firstname":        "",
@@ -70,12 +99,12 @@ func (self *ProfessorRouteTestSuite) Test_CreateProfRoute_ShouldReturnStatus400_
 	})
 	req, _ := http.NewRequest("POST", "/api/v1/prof", bytes.NewReader(body))
 
-	self.ginRouter.ServeHTTP(w, req)
+	prts.ginRouter.ServeHTTP(w, req)
 
-	self.Equal(http.StatusBadRequest, w.Result().StatusCode)
+	prts.Equal(http.StatusBadRequest, w.Result().StatusCode)
 }
 
-func (self *ProfessorRouteTestSuite) Test_CreateProfRoute_ShouldReturnStatus201_WhenGivenValidRequest() {
+func (prts *ProfessorRouteTestSuite) Test_CreateProfRoute_ShouldReturnStatus201_WhenGivenValidRequest() {
 	w := httptest.NewRecorder()
 	body, _ := json.Marshal(map[string]interface{}{
 		"firstname":        "Firstname",
@@ -87,12 +116,12 @@ func (self *ProfessorRouteTestSuite) Test_CreateProfRoute_ShouldReturnStatus201_
 
 	req, _ := http.NewRequest("POST", "/api/v1/prof", bytes.NewReader(body))
 
-	self.ginRouter.ServeHTTP(w, req)
+	prts.ginRouter.ServeHTTP(w, req)
 
-	self.Equal(http.StatusCreated, w.Result().StatusCode)
+	prts.Equal(http.StatusCreated, w.Result().StatusCode)
 }
 
-func (self *ProfessorRouteTestSuite) Test_CreateProfRoute_ShouldReturnStatus400_WhenGivenAnInvalidEmail() {
+func (prts *ProfessorRouteTestSuite) Test_CreateProfRoute_ShouldReturnStatus400_WhenGivenAnInvalidEmail() {
 	w := httptest.NewRecorder()
 	body, _ := json.Marshal(map[string]interface{}{
 		"firstname":        "Firstname",
@@ -104,12 +133,12 @@ func (self *ProfessorRouteTestSuite) Test_CreateProfRoute_ShouldReturnStatus400_
 
 	req, _ := http.NewRequest("POST", "/api/v1/prof", bytes.NewReader(body))
 
-	self.ginRouter.ServeHTTP(w, req)
+	prts.ginRouter.ServeHTTP(w, req)
 
-	self.Equal(http.StatusBadRequest, w.Result().StatusCode)
+	prts.Equal(http.StatusBadRequest, w.Result().StatusCode)
 }
 
-func (self *ProfessorRouteTestSuite) Test_CreateProfRoute_ShouldReturnStatus400_WhenGivenAnInvalidDirectoryListing() {
+func (prts *ProfessorRouteTestSuite) Test_CreateProfRoute_ShouldReturnStatus400_WhenGivenAnInvalidDirectoryListing() {
 	w := httptest.NewRecorder()
 
 	body, _ := json.Marshal(map[string]interface{}{
@@ -122,11 +151,30 @@ func (self *ProfessorRouteTestSuite) Test_CreateProfRoute_ShouldReturnStatus400_
 
 	req, _ := http.NewRequest("POST", "/api/v1/prof", bytes.NewReader(body))
 
-	self.ginRouter.ServeHTTP(w, req)
+	prts.ginRouter.ServeHTTP(w, req)
 
-	self.Equal(http.StatusBadRequest, w.Result().StatusCode)
+	prts.Equal(http.StatusBadRequest, w.Result().StatusCode)
 }
 
+func (prts *ProfessorRouteTestSuite) Test_CreateProfRoute_ShouldReturn500_WhenAnUnexpectedErrorOccursInServiceLayer() {
+	w := httptest.NewRecorder()
+	body, _ := json.Marshal(map[string]interface{}{
+		"firstname":        "Firstname",
+		"lastname":         "Lastname",
+		"directoryListing": "http://test.com",
+		"email":            "test@gmail.com",
+		"department":       "English",
+	})
+
+
+	req, _ := http.NewRequest("POST", "/api/v1/prof", bytes.NewReader(body))
+
+	internalErr:= exceptions.NewInternalServerError()
+	prts.professorServMock.On("CreateProfessor", mock.Anything).Return(&internalErr)
+	prts.ginRouterMock.ServeHTTP(w, req)
+
+	prts.Equal(http.StatusInternalServerError, w.Result().StatusCode)
+}
 func TestProfessorRouteTestSuite(t *testing.T) {
 	suite.Run(t, new(ProfessorRouteTestSuite))
 }

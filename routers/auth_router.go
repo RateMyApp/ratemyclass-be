@@ -15,12 +15,10 @@ type authRouter struct {
 // register Route
 func (ar *authRouter) registerRoute() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		var req signUpDto
-
-		ctx.ShouldBindJSON(&req)
+		var req registerUserReq
 
 		// validation
-		if validationErrorCheck(req, ctx) {
+		if validationErrorCheck(&req, ctx) {
 			return
 		}
 
@@ -38,27 +36,29 @@ func (ar *authRouter) registerRoute() gin.HandlerFunc {
 // login route
 func (ar *authRouter) loginRoute() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		var req loginDto
+		var req loginUserReq
 
-		ctx.BindJSON(&req)
+		// validation
+		if validationErrorCheck(&req, ctx) {
+			return
+		}
 
 		var command services.LoginCommand = services.LoginCommand{Email: req.Email, Password: req.Password}
 
-		err, user := ar.authService.CheckLogin(command)
+		err, user := ar.authService.LoginUser(command)
 		// error found
 		if err != nil {
 			ctx.JSON(err.StatusCode, err)
 			return
 		}
-		var resp services.UserDetails
-		// incorrect password
-		if user == resp {
-			ctx.JSON(http.StatusUnauthorized, gin.H{"message:": "Incorrect Password"})
-		} else {
-			// create jwtToken
-			tokenString, _ := ar.authService.GenerateJWTtoken(user)
-			ctx.JSON(http.StatusOK, tokenString)
+
+		resp := loginUserResp{
+			Email:       user.Email,
+			Firstname:   user.Firstname,
+			Lastname:    user.Lastname,
+			AccessToken: user.AccessToken,
 		}
+		ctx.JSON(http.StatusOK, resp)
 	}
 }
 
@@ -70,6 +70,7 @@ func (ar *authRouter) ExecRoutes() {
 	}
 }
 
+// Initializes a new Router responsible for authentication
 func NewAuthRouter(ginRouter *gin.Engine, authService services.AuthService) Router {
 	return &authRouter{ginRouter, authService}
 }
