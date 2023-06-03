@@ -10,7 +10,7 @@ import (
 type courseRouter struct {
 	ginRouter     *gin.Engine
 	courseService services.CourseService
-}
+	}
 
 func (self *courseRouter) createCourse() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
@@ -37,9 +37,9 @@ func (self *courseRouter) createCourse() gin.HandlerFunc {
 }
 
 func (self *courseRouter) ExecRoutes() {
-	routerGroup := self.ginRouter.Group("/api/v1/auth")
+	routerGroup := self.ginRouter.Group("/api/v1/course")
 	{
-		routerGroup.POST("/course", self.createCourse())
+		routerGroup.POST("", self.createCourse())
 	}
 }
 

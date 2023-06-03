@@ -28,7 +28,6 @@ func (pr *professorRouter) createProfRoute() gin.HandlerFunc {
 			return
 		}
 		ctx.JSON(http.StatusCreated, gin.H{"message": "Professor created"})
-		return
 	}
 }
 

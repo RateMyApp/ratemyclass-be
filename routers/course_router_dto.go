@@ -7,15 +7,15 @@ import (
 )
 
 type createCourseReq struct {
-	Code  string
-	Name  string
-	Units float32
+	Code  string  `code:"code"`
+	Name  string  `json:"name"`
+	Units float32 `json:"units"`
 }
 
-func (self createCourseReq) Validate() error {
-	return validation.ValidateStruct(&self,
-		validation.Field(&self.Code, validation.Required, is.UpperCase),
-		validation.Field(&self.Name, validation.Required),
-		validation.Field(&self.Units, validation.Required, validation.By(appvalidation.MaxDecimalPlaces(2))),
+func (ccr createCourseReq) Validate() error {
+	return validation.ValidateStruct(&ccr,
+		validation.Field(&ccr.Code, validation.Required, is.UpperCase),
+		validation.Field(&ccr.Name, validation.Required),
+		validation.Field(&ccr.Units, validation.Required, validation.By(appvalidation.MaxDecimalPlaces(2))),
 	)
 }
