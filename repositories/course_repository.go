@@ -16,8 +16,8 @@ type courseRepositoryImpl struct {
 	client *dao.PostgresClient
 }
 
-func (self *courseRepositoryImpl) SaveCourse(course models.Course) *exceptions.AppError {
-	result := self.client.Db.Create(&course)
+func (cr *courseRepositoryImpl) SaveCourse(course models.Course) *exceptions.AppError {
+	result := cr.client.Db.Create(&course)
 	if result.Error != nil {
 		log.Print(result.Error)
 		ie := exceptions.NewInternalServerError()
@@ -30,3 +30,4 @@ func (self *courseRepositoryImpl) SaveCourse(course models.Course) *exceptions.A
 func NewCoursRepository(client *dao.PostgresClient) CourseRepository {
 	return &courseRepositoryImpl{client: client}
 }
+		
