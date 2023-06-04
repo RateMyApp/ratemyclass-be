@@ -7,20 +7,20 @@ import (
 	"github.com/stretchr/testify/mock"
 )
 
-type ProfessorRepository struct {
+type CourseRepositoryMock struct {
 	mock.Mock
 }
 
-func (pr *ProfessorRepository) SaveProfessor(professor models.Professor) *exceptions.AppError {
-	args := pr.Called(professor)
+func (crm *CourseRepositoryMock) SaveCourse(course models.Course) *exceptions.AppError {
+	args := crm.Called(course)
 
 	var arg0 *exceptions.AppError = nil
 
 	if val, ok := args.Get(0).(*exceptions.AppError); ok {
 		arg0 = val
-	} 
+	}
 
 	return arg0
 }
 
-var _ repositories.ProfessorRepository = (*ProfessorRepository)(nil)
+var _ repositories.CourseRepository = (*CourseRepositoryMock)(nil)
