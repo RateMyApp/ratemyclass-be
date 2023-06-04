@@ -22,5 +22,5 @@ func (pr *ProfessorRepository) SaveProfessor(professor models.Professor) *except
 
 	return arg0
 }
-
+// type checking, check if this mock satisfies the repoistory interface,create a nil pointer of type mockRepo and compare
 var _ repositories.ProfessorRepository = (*ProfessorRepository)(nil)
