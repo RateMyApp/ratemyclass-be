@@ -5,27 +5,30 @@ import (
 	"github.com/go-ozzo/ozzo-validation/is"
 )
 
-type signUpDto struct {
+type registerUserReq struct {
 	Email     string `json:"email"`
 	Password  string `json:"password"`
 	Firstname string `json:"firstname"`
 	Lastname  string `json:"lastname"`
 }
-type loginDto struct{
-	Email string `json:"email"`
+
+func (self registerUserReq) Validate() error {
+	return validation.ValidateStruct(&self,
+		validation.Field(&self.Email, validation.Required, is.Email),
+		validation.Field(&self.Password, validation.Required, validation.Length(8, 0)),
+		validation.Field(&self.Firstname, validation.Required, validation.Length(2, 0)),
+		validation.Field(&self.Lastname, validation.Required, validation.Length(2, 0)),
+	)
+}
+
+type loginUserReq struct {
+	Email    string `json:"email"`
 	Password string `json:"password"`
 }
 
-type UserDetailsdto struct {
-	Firstname    string
-	Lastname     string
-	Email        string
-}
-func (sd signUpDto) Validate() error {
-	return validation.ValidateStruct(&sd,
-		validation.Field(&sd.Email, validation.Required, is.Email),
-		validation.Field(&sd.Password, validation.Required, validation.Length(8, 0)),
-		validation.Field(&sd.Firstname, validation.Required, validation.Length(2, 0)),
-		validation.Field(&sd.Lastname, validation.Required, validation.Length(2, 0)),
-	)
+type loginUserResp struct {
+	Firstname   string
+	Lastname    string
+	Email       string
+	AccessToken string
 }

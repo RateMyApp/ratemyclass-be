@@ -11,4 +11,5 @@ type School struct {
 	StudentHeadcount int
 	StaffHeadcount   int
 	Programs         []Program
+	Course           []Course
 }

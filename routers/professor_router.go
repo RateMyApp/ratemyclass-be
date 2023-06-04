@@ -16,9 +16,7 @@ func (pr *professorRouter) createProfRoute() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		var req CreateProfReq
 
-		ctx.ShouldBindJSON(&req)
-
-		if validationErrorCheck(req, ctx) {
+		if validationErrorCheck(&req, ctx) {
 			return
 		}
 
@@ -30,7 +28,6 @@ func (pr *professorRouter) createProfRoute() gin.HandlerFunc {
 			return
 		}
 		ctx.JSON(http.StatusCreated, gin.H{"message": "Professor created"})
-		return
 	}
 }
 

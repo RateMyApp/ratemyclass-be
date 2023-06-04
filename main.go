@@ -7,9 +7,10 @@ import (
 	"github.com/ratemyapp/routers"
 	"github.com/ratemyapp/server"
 	"github.com/ratemyapp/services"
+	"github.com/ratemyapp/utils"
 	"go.uber.org/fx"
 )
 
 func main() {
-	fx.New(server.Module, config.Module, routers.Module, dao.Module, services.Module, repositories.Module).Run()
+	fx.New(server.Module, config.Module, routers.Module, dao.Module, services.Module, repositories.Module, utils.Module).Run()
 }
