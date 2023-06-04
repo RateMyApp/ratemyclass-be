@@ -3,6 +3,7 @@ package mocks
 import (
 	"github.com/ratemyapp/exceptions"
 	"github.com/ratemyapp/models"
+	"github.com/ratemyapp/repositories"
 	"github.com/stretchr/testify/mock"
 )
 
@@ -23,3 +24,5 @@ func (cr *CourseRatingRepository) SaveCourseRating(courserating models.CourseRat
 
 	return arg0
 }
+//type checking
+var _ repositories.CourseRatingRepository = (*CourseRatingRepository)(nil)
