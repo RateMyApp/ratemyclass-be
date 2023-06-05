@@ -51,13 +51,13 @@ func (as *AuthServiceImpl) LoginUser(command LoginCommand) (*exceptions.AppError
 
 	// user does not exist, throw error
 	if existingUser == nil {
-		ce := exceptions.NewConflictError("Invalid Email or Password")
+		ce := exceptions.NewUnauthorizedError("Invalid Email or Password")
 		return &ce, nil
 	}
 
 	// password is correct
 	if passwordErr := bcrypt.CompareHashAndPassword([]byte(existingUser.Password), []byte(command.Password)); passwordErr != nil {
-		ce := exceptions.NewConflictError("Invalid Email or Password")
+		ce := exceptions.NewUnauthorizedError("Invalid Email or Password")
 		return &ce, nil
 	}
 
@@ -80,5 +80,5 @@ func (as *AuthServiceImpl) LoginUser(command LoginCommand) (*exceptions.AppError
 }
 
 func NewAuthServiceImpl(userRepo repositories.UserRepository, jwtService JwtService) AuthService {
-	return &AuthServiceImpl{userRepo: userRepo}
+	return &AuthServiceImpl{userRepo: userRepo, jwtService: jwtService}
 }

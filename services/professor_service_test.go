@@ -30,8 +30,8 @@ type ProfessorServiceTestSuite struct {
 
 func (psts *ProfessorServiceTestSuite) SetupSuite() {
 	os.Setenv("GO_ENV", "testing")
-	appConfig = config.InitAppConfig()
-	_, psts.client = dao.NewPostgresClient(appConfig)
+	psts.appConfig = config.InitAppConfig()
+	_, psts.client = dao.NewPostgresClient(psts.appConfig)
 	psts.client.Init()
 	// normal setup
 	psts.professorRepo = repositories.NewProfessorRepository(psts.client)
