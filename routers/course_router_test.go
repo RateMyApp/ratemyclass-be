@@ -132,12 +132,12 @@ func (crts *CourseRouterTestSuite) Test_CreateCourseRoute_ShouldReturn500_WhenAn
 	body, _ := json.Marshal(map[string]interface{}{
 		"code":  "ECE657",
 		"name":  "Artificial Intelligence",
-		"units": 0.42,
+		"units": 0.45,
 	})
 	req, _ := http.NewRequest("POST", "/api/v1/course", bytes.NewReader(body))
 
 	internalErr:= exceptions.NewInternalServerError()
-	crts.courseServiceMock.On("CreateProfessor", mock.Anything).Return(&internalErr)
+	crts.courseServiceMock.On("CreateCourse", mock.Anything).Return(&internalErr)
 	crts.ginRouterMock.ServeHTTP(w, req)
 	crts.Equal(http.StatusInternalServerError, w.Result().StatusCode)
 }

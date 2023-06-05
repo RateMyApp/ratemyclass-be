@@ -18,7 +18,7 @@ type courseServiceImpl struct {
 
 // Creates a course using the CreateCourseCommand
 func (csi *courseServiceImpl) CreateCourse(command CreateCourseCommand) *exceptions.AppError {
-	newCourse := models.Course{Name: command.Name, Units: float32(command.Units), Code: command.Code}
+	newCourse := models.Course{Name: command.Name, Units: command.Units, Code: command.Code}
 	err := csi.courseRepo.SaveCourse(newCourse)
 	if err != nil {
 		return err

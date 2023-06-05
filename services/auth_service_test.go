@@ -14,133 +14,171 @@ import (
 	"github.com/ratemyapp/repositories"
 	"github.com/ratemyapp/services"
 	"github.com/ratemyapp/utils"
-	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
+	"github.com/stretchr/testify/suite"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 )
 
-var (
-	appConfig          config.AppConfig
+type AuthServiceTestSuite struct {
+	suite.Suite
+	appconfig          config.AppConfig
 	postgresClient     *dao.PostgresClient
 	transaction        *gorm.DB
 	testUser           models.User
 	userRepostory      repositories.UserRepository
 	authService        services.AuthService
 	userRepositoryMock *mocks.UserRepositoryMock
-	authServiceMock    services.AuthService
-)
+	authServiceMock1   services.AuthService
+	authServiceMock2   services.AuthService
+	jwtService         services.JwtService
+	jwtServiceMock     *mocks.JwtServiceMock
+}
 
-func beforeAll() {
+func (asts *AuthServiceTestSuite) SetupSuite() {
 	os.Setenv("GO_ENV", "testing")
 	// config
-	appConfig = config.InitAppConfig()
+	asts.appconfig = config.InitAppConfig()
 
 	// db client
-	_, client := dao.NewPostgresClient(appConfig)
-	postgresClient = client
-	postgresClient.Init()
-	testUser = models.User{Email: "test@gmail.com", Firstname: "Test1", Lastname: "TestTwo", Password: "hello123"}
-	postgresClient.Db.Create(&testUser)
+	_, client := dao.NewPostgresClient(asts.appconfig)
+	asts.postgresClient = client
+	asts.postgresClient.Init()
+	asts.testUser = models.User{Email: "test@gmail.com", Firstname: "Test1", Lastname: "TestTwo", Password: "hello123"}
+	asts.postgresClient.Db.Create(&asts.testUser)
 
 	// repositories
-	userRepostory = repositories.NewUserRepository(postgresClient)
-	userRepositoryMock = new(mocks.UserRepositoryMock)
+	asts.userRepostory = repositories.NewUserRepository(asts.postgresClient)
+	asts.userRepositoryMock = new(mocks.UserRepositoryMock)
 
 	// utils
 	timeUtil := utils.NewTimeUtil()
-	timeUtilMock := new(mocks.TimeUtilMock)
 	jwtUtil := utils.NewJwtUtil()
 
 	// services
-	jwtService := services.NewJwtService(appConfig, jwtUtil, timeUtil)
-	jwtServiceMock := services.NewJwtService(appConfig, jwtUtil, timeUtilMock)
-	authService = services.NewAuthServiceImpl(userRepostory, jwtService)
-	authServiceMock = services.NewAuthServiceImpl(userRepositoryMock, jwtServiceMock)
-}
+	asts.jwtService = services.NewJwtService(asts.appconfig, jwtUtil, timeUtil)
+	asts.jwtServiceMock = &mocks.JwtServiceMock{}
+	asts.authService = services.NewAuthServiceImpl(asts.userRepostory, asts.jwtService)
+	asts.authServiceMock1 = services.NewAuthServiceImpl(asts.userRepositoryMock, asts.jwtServiceMock)
+	asts.authServiceMock2 = services.NewAuthServiceImpl(asts.userRepostory, asts.jwtServiceMock)
 
-func beforeEach() {
-	transaction = postgresClient.Db.Begin()
 }
+func (asts *AuthServiceTestSuite) SetupTest() {
 
-func afterEach() {
-	transaction.Rollback()
+	asts.transaction = asts.postgresClient.Db.Begin()
 }
-
-func afterAll() {
+func (asts *AuthServiceTestSuite) TearDownTest() {
+	asts.transaction.Rollback()
+}
+func (asts *AuthServiceTestSuite) TearDownSuite() {
 	for _, model := range *models.GetModels() {
-		postgresClient.Db.Unscoped().Where("1 = 1").Delete(model)
+		asts.postgresClient.Db.Unscoped().Where("1 = 1").Delete(model)
 	}
 	ctx := context.Background()
-	postgresClient.Close(ctx)
+	asts.postgresClient.Close(ctx)
 }
 
-func TestMain(m *testing.M) {
-	beforeAll()
-	defer afterAll()
-	m.Run()
-}
-
-func Test_RegisterUserCommand_ShouldReturnNoError_WhenUserDoesNotExist(t *testing.T) {
-	beforeEach()
-	defer afterEach()
-	assert := assert.New(t)
+func (asts *AuthServiceTestSuite) Test_RegisterUserCommand_ShouldReturnNoError_WhenUserDoesNotExist() {
 	command := services.RegisterCommand{Email: "test2@gmail.com", Password: "hello123", Firstname: "TestFirstname", Lastname: "TestLastname"}
 
-	err := authService.RegisterUser(command)
+	err := asts.authService.RegisterUser(command)
 
-	assert.Nil(err)
+	asts.Nil(err)
 
-	foundUser, err := userRepostory.FindUserByEmail(command.Email)
+	foundUser, err := asts.userRepostory.FindUserByEmail(command.Email)
 
-	assert.Nil(err)
+	asts.Nil(err)
 
-	assert.Equal(command.Email, foundUser.Email)
-	assert.Equal(command.Firstname, foundUser.Firstname)
-	assert.Equal(command.Lastname, foundUser.Lastname)
+	asts.Equal(command.Email, foundUser.Email)
+	asts.Equal(command.Firstname, foundUser.Firstname)
+	asts.Equal(command.Lastname, foundUser.Lastname)
 	passwordEncryptErr := bcrypt.CompareHashAndPassword([]byte(foundUser.Password), []byte(command.Password))
-	assert.Nil(passwordEncryptErr)
+	asts.Nil(passwordEncryptErr)
 }
 
-func Test_RegisterUserCommand_ShouldReturnConflictAppErr_WhenUserAlreadyExists(t *testing.T) {
-	beforeEach()
-	defer afterEach()
-	assert := assert.New(t)
+func (asts *AuthServiceTestSuite) Test_RegisterUserCommand_ShouldReturnConflictAppErr_WhenUserAlreadyExists() {
 
 	command := services.RegisterCommand{Email: "test@gmail.com", Firstname: "Test1", Lastname: "TestTwo", Password: "hello123"}
-	err := authService.RegisterUser(command)
+	err := asts.authService.RegisterUser(command)
 
-	assert.NotNil(err)
-	assert.Equal(err.StatusCode, http.StatusConflict)
+	asts.NotNil(err)
+	asts.Equal(err.StatusCode, http.StatusConflict)
 }
 
-func Test_RegisterUserCommand_ShouldReturnInternalAppErr_WhenFindUserByEmailNotWorking(t *testing.T) {
-	beforeEach()
-	defer afterEach()
-	assert := assert.New(t)
+func (asts *AuthServiceTestSuite) Test_RegisterUserCommand_ShouldReturnInternalAppErr_WhenFindUserByEmailNotWorking() {
 	internalErr := exceptions.NewInternalServerError()
-	mockCall := userRepositoryMock.On("FindUserByEmail", mock.Anything).Return(nil, &internalErr)
+	mockCall := asts.userRepositoryMock.On("FindUserByEmail", mock.Anything).Return(nil, &internalErr)
 
 	command := services.RegisterCommand{Email: "test2@gmail.com", Password: "hello123", Firstname: "TestFirstname", Lastname: "TestLastname"}
-	err := authServiceMock.RegisterUser(command)
+	err := asts.authServiceMock1.RegisterUser(command)
 	// userRepositoryMock.AssertExpectations(t)
-	assert.NotNil(err)
-	assert.Equal(http.StatusInternalServerError, err.StatusCode)
+	asts.NotNil(err)
+	asts.Equal(http.StatusInternalServerError, err.StatusCode)
 	mockCall.Unset()
 }
 
-func Test_RegisterUserCommand_ShouldReturnInternalAppErr_WhenSaveUserNotWorking(t *testing.T) {
-	beforeEach()
-	defer afterEach()
-	assert := assert.New(t)
+func (asts *AuthServiceTestSuite) Test_RegisterUserCommand_ShouldReturnInternalAppErr_WhenSaveUserNotWorking() {
 	internalErr := exceptions.NewInternalServerError()
-	userRepositoryMock.On("FindUserByEmail", mock.Anything).Return(nil, nil)
-	userRepositoryMock.On("SaveUser", mock.Anything).Return(&internalErr)
+	asts.userRepositoryMock.On("FindUserByEmail", mock.Anything).Return(nil, nil)
+	asts.userRepositoryMock.On("SaveUser", mock.Anything).Return(&internalErr)
 
 	command := services.RegisterCommand{Email: "test2@gmail.com", Password: "hello123", Firstname: "TestFirstname", Lastname: "TestLastname"}
-	err := authServiceMock.RegisterUser(command)
+	err := asts.authServiceMock1.RegisterUser(command)
 	// userRepositoryMock.AssertExpectations(t)
 	// userRepositoryMock.AssertExpectations(t)
-	assert.NotNil(err)
-	assert.Equal(http.StatusInternalServerError, err.StatusCode)
+	asts.NotNil(err)
+	asts.Equal(http.StatusInternalServerError, err.StatusCode)
+}
+
+func (asts *AuthServiceTestSuite) Test_LoginUser_ShouldReturnUnAuthorizedException_WhenUserEmailIsInValid() {
+	registerCommand := services.RegisterCommand{Email: "test1@gmail.com", Firstname: "Test1", Lastname: "TestTwo", Password: "password"}
+	asts.authService.RegisterUser(registerCommand)
+
+	loginCommand := services.LoginCommand{Email: "test2@gmail.com", Password: "password"}
+	err, userInfo := asts.authService.LoginUser(loginCommand)
+	asts.Nil(userInfo)
+	asts.NotNil(err)
+	asts.Equal(http.StatusUnauthorized, err.StatusCode)
+}
+
+func (asts *AuthServiceTestSuite) Test_LoginUser_ShouldReturnUnAuthorizedException_WhenPasswordisInvalid() {
+	registerCommand := services.RegisterCommand{Email: "test3@gmail.com", Firstname: "Test1", Lastname: "TestTwo", Password: "password"}
+	asts.authService.RegisterUser(registerCommand)
+
+	loginCommand := services.LoginCommand{Email: "test3@gmail.com", Password: "incorrectpassword"}
+	err, userInfo := asts.authService.LoginUser(loginCommand)
+	asts.Nil(userInfo)
+	asts.NotNil(err)
+	asts.Equal(http.StatusUnauthorized, err.StatusCode)
+}
+
+func (asts *AuthServiceTestSuite) Test_LoginUser_ShouldReturnInternalServerException_WhenGeneratingATokenFails() {
+	registerCommand := services.RegisterCommand{Email: "test1@gmail.com", Firstname: "Test1", Lastname: "TestTwo", Password: "password"}
+	asts.authService.RegisterUser(registerCommand)
+	internalError := exceptions.NewInternalServerError()
+	asts.jwtServiceMock.On("GenerateAccessToken", mock.Anything).Return("", &internalError)
+	loginCommand := services.LoginCommand{Email: "test1@gmail.com", Password: "password"}
+	err, userInfo := asts.authServiceMock2.LoginUser(loginCommand)
+	asts.Nil(userInfo)
+	if asts.NotNil(err) {
+		asts.Equal(http.StatusInternalServerError, err.StatusCode)
+	}
+}
+
+func (asts *AuthServiceTestSuite) Test_LoginUser_ShouldReturnUserInfo_WhenEmailAndPasswordMatch() {
+	registerCommand := services.RegisterCommand{Email: "test1@gmail.com", Firstname: "Test1", Lastname: "TestTwo", Password: "password"}
+	asts.authService.RegisterUser(registerCommand)
+
+	loginCommand := services.LoginCommand{Email: "test1@gmail.com", Password: "password"}
+	err, userInfo := asts.authService.LoginUser(loginCommand)
+	asts.Nil(err)
+	asts.NotNil(userInfo)
+	asts.Equal(registerCommand.Email, userInfo.Email)
+	asts.Equal(registerCommand.Firstname, userInfo.Firstname)
+	asts.Equal(registerCommand.Lastname, userInfo.Lastname)
+	asts.NotEmpty(userInfo.AccessToken)
+}
+
+func TestAuthServiceTestSuite(t *testing.T) {
+	suite.Run(t, new(AuthServiceTestSuite))
 }

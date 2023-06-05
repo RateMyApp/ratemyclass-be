@@ -11,7 +11,7 @@ import (
 
 type JwtService interface {
 	GenerateAccessToken(command GenerateTokenCommand) (string, *exceptions.AppError)
-	VerifyAccessToken(token string)
+	// VerifyAccessToken(token string)
 }
 
 type jwtServiceImpl struct {
@@ -21,11 +21,11 @@ type jwtServiceImpl struct {
 	jwtUtil             utils.JwtUtil
 }
 
-func (self *jwtServiceImpl) VerifyAccessToken(string) {
-}
+// func (self *jwtServiceImpl) VerifyAccessToken(string) {
+// }
 
-func (self *jwtServiceImpl) GenerateAccessToken(command GenerateTokenCommand) (string, *exceptions.AppError) {
-	appTime := self.timeUtil.GenerateTime(uint(self.accessTokenDuration))
+func (jsi *jwtServiceImpl) GenerateAccessToken(command GenerateTokenCommand) (string, *exceptions.AppError) {
+	appTime := jsi.timeUtil.GenerateTime(uint(jsi.accessTokenDuration))
 
 	claim := utils.JwtClaim{
 		Email:     command.Email,
@@ -35,7 +35,7 @@ func (self *jwtServiceImpl) GenerateAccessToken(command GenerateTokenCommand) (s
 	}
 
 	// sign the token
-	tokenString, err := self.jwtUtil.GenerateJwtToken(self.accessTokenSecret, claim)
+	tokenString, err := jsi.jwtUtil.GenerateJwtToken(jsi.accessTokenSecret, claim)
 	if err != nil {
 		log.Println(err)
 		exc := exceptions.NewInternalServerError()
