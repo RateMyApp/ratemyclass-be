@@ -39,7 +39,7 @@ func (csts *CourseServicesTestSuite) SetupSuite() {
 	csts.dbclient.Init()
 
 	// repository
-	csts.courseRepo = repositories.NewCoursRepository(csts.dbclient)
+	csts.courseRepo = repositories.NewCourseRepository(csts.dbclient)
 	csts.courseRepoMock = mocks.CourseRepositoryMock{}
 
 	// services

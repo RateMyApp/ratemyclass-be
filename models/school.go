@@ -7,9 +7,13 @@ import (
 type School struct {
 	gorm.Model
 	Name             string
-	Location         string
+	Address          string
+	City             string
+	ProvinceOrState  string
+	Country          string
 	StudentHeadcount int
 	StaffHeadcount   int
 	Programs         []Program
 	Course           []Course
+	EmailDomains     []EmailDomain
 }

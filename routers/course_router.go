@@ -23,7 +23,7 @@ func (self *courseRouter) createCourse() gin.HandlerFunc {
 		command := services.CreateCourseCommand{
 			Code:  req.Code,
 			Name:  req.Name,
-			Units: float64(req.Units),
+			Units: req.Units,
 		}
 
 		err := self.courseService.CreateCourse(command)

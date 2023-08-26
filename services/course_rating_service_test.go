@@ -30,8 +30,8 @@ type CourseRatingServiceTestSuite struct {
 
 func (crst *CourseRatingServiceTestSuite) SetupSuite() {
 	os.Setenv("GO_ENV", "testing")
-	appConfig = config.InitAppConfig()
-	_, crst.client = dao.NewPostgresClient(appConfig)
+	crst.appConfig = config.InitAppConfig()
+	_, crst.client = dao.NewPostgresClient(crst.appConfig)
 	crst.client.Init()
 	crst.courseratingrepo = repositories.NewCourseRatingRepository(crst.client)
 	crst.courseratingserv = services.NewCourseRatingService(crst.courseratingrepo)
