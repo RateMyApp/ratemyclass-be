@@ -37,34 +37,34 @@ type CourseRouterTestSuite struct {
 	courseRepo repositories.CourseRepository
 
 	// services
-	courseService services.CourseService
+	courseService     services.CourseService
 	courseServiceMock mocks.CourseServiceMock
 
 	// router
-	courseRouter routers.Router
+	courseRouter     routers.Router
 	courseRouterMock routers.Router
-	ginRouter    *gin.Engine
-	ginRouterMock *gin.Engine
+	ginRouter        *gin.Engine
+	ginRouterMock    *gin.Engine
 }
 
 func (crts *CourseRouterTestSuite) SetupSuite() {
 	crts.config = config.InitAppConfig()
 
-	// db 
+	// db
 	_, crts.dbclient = dao.NewPostgresClient(crts.config)
 	crts.dbclient.Init()
 
 	// repo
-	crts.courseRepo = repositories.NewCoursRepository(crts.dbclient)
+	crts.courseRepo = repositories.NewCourseRepository(crts.dbclient)
 
 	// services
 	crts.courseService = services.NewCourseService(crts.courseRepo)
 	crts.courseServiceMock = mocks.CourseServiceMock{}
 
-	// routers 
+	// routers
 	crts.ginRouter = gin.Default()
 	crts.ginRouterMock = gin.Default()
-	crts.courseRouterMock = routers.NewCourseRouter(crts.ginRouterMock, &crts.courseServiceMock )
+	crts.courseRouterMock = routers.NewCourseRouter(crts.ginRouterMock, &crts.courseServiceMock)
 	crts.courseRouterMock.ExecRoutes()
 	crts.courseRouter = routers.NewCourseRouter(crts.ginRouter, crts.courseService)
 	crts.courseRouter.ExecRoutes()
@@ -97,12 +97,11 @@ func (crts *CourseRouterTestSuite) Test_CreateCourseRoute_ShouldReturn200_WhenGi
 
 	crts.ginRouter.ServeHTTP(w, req)
 	testBody, _ := io.ReadAll(w.Body)
-	log.Println(string( testBody ))
+	log.Println(string(testBody))
 	crts.Equal(http.StatusCreated, w.Result().StatusCode)
 }
 
-
-func (crts *CourseRouterTestSuite) Test_CreateCourseRoute_ShouldReturn400_WhenGivenAInvalidReq(){
+func (crts *CourseRouterTestSuite) Test_CreateCourseRoute_ShouldReturn400_WhenGivenAInvalidReq() {
 	w := httptest.NewRecorder()
 	body, _ := json.Marshal(map[string]interface{}{
 		"code":  "",
@@ -115,7 +114,7 @@ func (crts *CourseRouterTestSuite) Test_CreateCourseRoute_ShouldReturn400_WhenGi
 	crts.Equal(http.StatusBadRequest, w.Result().StatusCode)
 }
 
-func (crts *CourseRouterTestSuite) Test_CreateCourseRoute_ShouldReturn400_WhenGivenUnitGreaterThan2DecimalPlaces(){
+func (crts *CourseRouterTestSuite) Test_CreateCourseRoute_ShouldReturn400_WhenGivenUnitGreaterThan2DecimalPlaces() {
 	w := httptest.NewRecorder()
 	body, _ := json.Marshal(map[string]interface{}{
 		"code":  "ECE657",
@@ -127,7 +126,7 @@ func (crts *CourseRouterTestSuite) Test_CreateCourseRoute_ShouldReturn400_WhenGi
 	crts.ginRouter.ServeHTTP(w, req)
 	crts.Equal(http.StatusBadRequest, w.Result().StatusCode)
 }
-func (crts *CourseRouterTestSuite) Test_CreateCourseRoute_ShouldReturn500_WhenAnUnexpectedErrorOccursInServiceLayer(){
+func (crts *CourseRouterTestSuite) Test_CreateCourseRoute_ShouldReturn500_WhenAnUnexpectedErrorOccursInServiceLayer() {
 	w := httptest.NewRecorder()
 	body, _ := json.Marshal(map[string]interface{}{
 		"code":  "ECE657",
@@ -136,7 +135,7 @@ func (crts *CourseRouterTestSuite) Test_CreateCourseRoute_ShouldReturn500_WhenAn
 	})
 	req, _ := http.NewRequest("POST", "/api/v1/course", bytes.NewReader(body))
 
-	internalErr:= exceptions.NewInternalServerError()
+	internalErr := exceptions.NewInternalServerError()
 	crts.courseServiceMock.On("CreateCourse", mock.Anything).Return(&internalErr)
 	crts.ginRouterMock.ServeHTTP(w, req)
 	crts.Equal(http.StatusInternalServerError, w.Result().StatusCode)

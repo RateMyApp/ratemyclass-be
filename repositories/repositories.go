@@ -10,6 +10,12 @@ var Module = fx.Module("repositories", fx.Provide(
 		NewProfessorRepository, fx.As(new(ProfessorRepository)),
 	),
 	fx.Annotate(
-		NewCoursRepository, fx.As(new(CourseRepository)),
+		NewCourseRatingRepository, fx.As(new(CourseRatingRepository)),
+	),
+	fx.Annotate(
+		NewCourseRepository, fx.As(new(CourseRepository)),
+	),
+	fx.Annotate(
+		NewSchoolRepository, fx.As(new(SchoolRepository)),
 	),
 ))

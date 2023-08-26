@@ -31,7 +31,7 @@ func (crts *CourseReposiotoryTestSuite) SetupSuite() {
 	crts.client.Init()
 
 	// repository
-	crts.courseRepo = repositories.NewCoursRepository(crts.client)
+	crts.courseRepo = repositories.NewCourseRepository(crts.client)
 }
 
 func (crts *CourseReposiotoryTestSuite) SetupTest() {

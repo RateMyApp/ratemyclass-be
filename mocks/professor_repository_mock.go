@@ -22,5 +22,4 @@ func (pr *ProfessorRepository) SaveProfessor(professor models.Professor) *except
 
 	return arg0
 }
-
 var _ repositories.ProfessorRepository = (*ProfessorRepository)(nil)

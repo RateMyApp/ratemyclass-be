@@ -29,7 +29,12 @@ func (as *AuthServiceImpl) RegisterUser(command RegisterCommand) *exceptions.App
 		return &ce
 	}
 
-	hashPassword, _ := bcrypt.GenerateFromPassword([]byte(command.Password), 8)
+	hashPassword, passwordHashError := bcrypt.GenerateFromPassword([]byte(command.Password), 8)
+
+	if passwordHashError != nil {
+		phe := exceptions.NewInternalServerError()
+		return &phe
+	}
 
 	command.Password = string(hashPassword)
 

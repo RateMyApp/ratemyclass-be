@@ -27,7 +27,6 @@ func (cr *courseRepositoryImpl) SaveCourse(course models.Course) *exceptions.App
 	return nil
 }
 
-func NewCoursRepository(client *dao.PostgresClient) CourseRepository {
+func NewCourseRepository(client *dao.PostgresClient) CourseRepository {
 	return &courseRepositoryImpl{client: client}
 }
-		
